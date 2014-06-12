@@ -101,12 +101,11 @@ var SBGNContainer = Backbone.View.extend({
         container.html("");
         container.append(_.template($("#loading-template").html()));
 
-        var xmlObject = loadXMLDoc(this.model.url);
-        var cytoscapeJsGraph = sbgnmlToJson(xmlObject);
+        var cytoscapeJsGraph = (this.model.cytoscapeJsGraph);
 
         var positionMap = {};
 
-        //add position information to data
+        //add position information to data for preset layout
         for (var i = 0 ; i < cytoscapeJsGraph.nodes.length ; i++){
             var xPos = cytoscapeJsGraph.nodes[i].data.sbgnbbox.x;
             var yPos = cytoscapeJsGraph.nodes[i].data.sbgnbbox.y;

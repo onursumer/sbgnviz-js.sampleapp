@@ -1,3 +1,45 @@
+ function stringtoXML(text){
+                if (window.ActiveXObject){
+                  var doc=new ActiveXObject('Microsoft.XMLDOM');
+                  doc.async='false';
+                  doc.loadXML(text);
+                } else {
+                  var parser=new DOMParser();
+                  var doc=parser.parseFromString(text,'text/xml');
+                }
+                return doc;
+            };
+
+window.onload = function() {
+        var fileInput = document.getElementById('file-input');
+        //var fileDisplayArea = document.getElementById('fileDisplayArea');
+
+        fileInput.addEventListener('change', function(e) {
+            var file = fileInput.files[0];
+            var textType = /text.*/;
+
+            if (file.type.match(textType)) {
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    //fileDisplayArea.innerText = reader.result;
+                    var x = 5;
+                    (new SBGNContainer({
+                        el: '#sbgn-network-container',
+                        model : {cytoscapeJsGraph : sbgnmlToJson(stringtoXML(this.result))}
+                    })).render();
+                }
+
+                reader.readAsText(file);    
+            } else {
+                //fileDisplayArea.innerText = "File not supported!"
+            }
+        });
+};
+
+
+
+
 var sbgnLayoutProp = new SBGNLayout({
         el: '#sbgn-layout-table'
     });
@@ -45,44 +87,56 @@ $("#about").click(function(e){
 });
 
 $("#load-sample1").click(function(e){
+    var xmlObject = loadXMLDoc('samples/sample1.xml');
+
     (new SBGNContainer({
-        el : '#sbgn-network-container',
-        model : {url : 'samples/sample1.xml'}
+        el: '#sbgn-network-container',
+        model : {cytoscapeJsGraph : sbgnmlToJson(xmlObject)}
     })).render();
 });
 
 $("#load-sample2").click(function(e){
+    var xmlObject = loadXMLDoc('samples/sample2.xml');
+
     (new SBGNContainer({
         el: '#sbgn-network-container',
-        model : {url : 'samples/sample2.xml'}
+        model : {cytoscapeJsGraph : sbgnmlToJson(xmlObject)}
     })).render();
 });
 
 $("#load-sample3").click(function(e){
+    var xmlObject = loadXMLDoc('samples/sample3.xml');
+
     (new SBGNContainer({
         el: '#sbgn-network-container',
-        model : {url : 'samples/sample3.xml'}
+        model : {cytoscapeJsGraph : sbgnmlToJson(xmlObject)}
     })).render();
 });
 
 $("#load-sample4").click(function(e){
+    var xmlObject = loadXMLDoc('samples/sample4.xml');
+
     (new SBGNContainer({
         el: '#sbgn-network-container',
-        model : {url : 'samples/sample4.xml'}
+        model : {cytoscapeJsGraph : sbgnmlToJson(xmlObject)}
     })).render();
 });
 
 $("#load-sample5").click(function(e){
+    var xmlObject = loadXMLDoc('samples/sample5.xml');
+
     (new SBGNContainer({
         el: '#sbgn-network-container',
-        model : {url : 'samples/sample5.xml'}
+        model : {cytoscapeJsGraph : sbgnmlToJson(xmlObject)}
     })).render();
 });
 
 $("#load-sample6").click(function(e){
+    var xmlObject = loadXMLDoc('samples/sample6.xml');
+
     (new SBGNContainer({
         el: '#sbgn-network-container',
-        model : {url : 'samples/sample6.xml'}
+        model : {cytoscapeJsGraph : sbgnmlToJson(xmlObject)}
     })).render();
 });
 
@@ -120,17 +174,19 @@ $("#perform-layout").click(function(e){
 
 $("#save-as-png").click(function(evt){
     var pngContent = cy.png();
-/*
-    _.each($("#main-network-view canvas"), function(canvas) {
-        if($(canvas).data("id").indexOf("buffer") == 0) {
-            $(canvas).remove();
-        }
-    });
-*/
     window.open(pngContent, "_blank");
 });
 
 $("#load-file").click(function(evt){
+    $("#file-input").trigger('click');
 });
+
+$("#save-as-json").click(function(evt){
+    var pngContent = cy.json();
+    
+    var plainJson = JSON.stringify(pngContent);
+    window.open(plainJson, "_blank");
+});
+
 
 

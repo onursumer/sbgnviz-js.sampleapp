@@ -19,7 +19,7 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             'background-opacity' : '0',
             'background-color' : '#FFFFFF'
         })
-        .selector("node[sbgnclass!='complex'][sbgnclass!='compartment']")
+        .selector("node[sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
         .css({
             'width' : 'data(sbgnbbox.w)',
             'height' : 'data(sbgnbbox.h)'
@@ -98,8 +98,8 @@ var SBGNContainer = Backbone.View.extend({
 
     render: function(){
         var container = $(this.el);
-        container.html("");
-        container.append(_.template($("#loading-template").html()));
+        // container.html("");
+        // container.append(_.template($("#loading-template").html()));
 
         var cytoscapeJsGraph = (this.model.cytoscapeJsGraph);
 

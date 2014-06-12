@@ -1,15 +1,3 @@
- function stringtoXML(text){
-                if (window.ActiveXObject){
-                  var doc=new ActiveXObject('Microsoft.XMLDOM');
-                  doc.async='false';
-                  doc.loadXML(text);
-                } else {
-                  var parser=new DOMParser();
-                  var doc=parser.parseFromString(text,'text/xml');
-                }
-                return doc;
-            };
-
 window.onload = function() {
         var fileInput = document.getElementById('file-input');
         //var fileDisplayArea = document.getElementById('fileDisplayArea');
@@ -26,7 +14,8 @@ window.onload = function() {
                     var x = 5;
                     (new SBGNContainer({
                         el: '#sbgn-network-container',
-                        model : {cytoscapeJsGraph : sbgnmlToJson(stringtoXML(this.result))}
+                        model : {cytoscapeJsGraph : 
+                            sbgnmlToJson.convert(textToXmlObject(this.result))}
                     })).render();
                 }
 
@@ -37,12 +26,9 @@ window.onload = function() {
         });
 };
 
-
-
-
 var sbgnLayoutProp = new SBGNLayout({
-        el: '#sbgn-layout-table'
-    });
+    el: '#sbgn-layout-table'
+});
 
 $("#node-legend").click(function(e){
     e.preventDefault();
@@ -91,7 +77,7 @@ $("#load-sample1").click(function(e){
 
     (new SBGNContainer({
         el: '#sbgn-network-container',
-        model : {cytoscapeJsGraph : sbgnmlToJson(xmlObject)}
+        model : {cytoscapeJsGraph : sbgnmlToJson.convert(xmlObject)}
     })).render();
 });
 
@@ -100,7 +86,7 @@ $("#load-sample2").click(function(e){
 
     (new SBGNContainer({
         el: '#sbgn-network-container',
-        model : {cytoscapeJsGraph : sbgnmlToJson(xmlObject)}
+        model : {cytoscapeJsGraph : sbgnmlToJson.convert(xmlObject)}
     })).render();
 });
 
@@ -109,7 +95,7 @@ $("#load-sample3").click(function(e){
 
     (new SBGNContainer({
         el: '#sbgn-network-container',
-        model : {cytoscapeJsGraph : sbgnmlToJson(xmlObject)}
+        model : {cytoscapeJsGraph : sbgnmlToJson.convert(xmlObject)}
     })).render();
 });
 
@@ -118,7 +104,7 @@ $("#load-sample4").click(function(e){
 
     (new SBGNContainer({
         el: '#sbgn-network-container',
-        model : {cytoscapeJsGraph : sbgnmlToJson(xmlObject)}
+        model : {cytoscapeJsGraph : sbgnmlToJson.convert(xmlObject)}
     })).render();
 });
 
@@ -127,7 +113,7 @@ $("#load-sample5").click(function(e){
 
     (new SBGNContainer({
         el: '#sbgn-network-container',
-        model : {cytoscapeJsGraph : sbgnmlToJson(xmlObject)}
+        model : {cytoscapeJsGraph : sbgnmlToJson.convert(xmlObject)}
     })).render();
 });
 
@@ -136,7 +122,7 @@ $("#load-sample6").click(function(e){
 
     (new SBGNContainer({
         el: '#sbgn-network-container',
-        model : {cytoscapeJsGraph : sbgnmlToJson(xmlObject)}
+        model : {cytoscapeJsGraph : sbgnmlToJson.convert(xmlObject)}
     })).render();
 });
 

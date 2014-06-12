@@ -10,185 +10,261 @@ function loadXMLDoc(filename) {
     return xhttp.responseXML;
 };
 
-function bboxProp(ele){
-    var sbgnbbox = new Object();
-
-    sbgnbbox.x = $(ele).find('bbox').attr('x');
-    sbgnbbox.y = $(ele).find('bbox').attr('y');
-    sbgnbbox.w = $(ele).find('bbox').attr('w');
-    sbgnbbox.h = $(ele).find('bbox').attr('h');
-
-    //set positions as center
-    sbgnbbox.x = parseFloat(sbgnbbox.x) + parseFloat(sbgnbbox.w)/2;
-    sbgnbbox.y = parseFloat(sbgnbbox.y) + parseFloat(sbgnbbox.h)/2;
-
-    return sbgnbbox;
+function textToXmlObject(text){
+    if (window.ActiveXObject){
+      var doc=new ActiveXObject('Microsoft.XMLDOM');
+      doc.async='false';
+      doc.loadXML(text);
+    } else {
+      var parser=new DOMParser();
+      var doc=parser.parseFromString(text,'text/xml');
+    }
+    return doc;
 };
 
-function stateAndInfoBboxProp(ele, parentBbox){
-    var xPos = parseFloat(parentBbox.x);
-    var yPos = parseFloat(parentBbox.y);
+var sbgnmlToJson = {
+    getAllCompartments : function(xmlObject){
+        var compartments = [];
+        $(xmlObject).find("glyph[class='compartment']").each(function(){
+            compartments.push({
+                'x' : parseFloat($(this).children('bbox').attr('x')),
+                'y' : parseFloat($(this).children('bbox').attr('y')),
+                'w' : parseFloat($(this).children('bbox').attr('w')),
+                'h' : parseFloat($(this).children('bbox').attr('h')),
+                'id' : $(this).attr('id')
+            });
+        });
 
-    var sbgnbbox = new Object();
+        compartments.sort(function(c1, c2){
+            if(c1.h * c1.w < c2.h * c2.w)
+                return -1;
+            if(c1.h * c1.w > c2.h * c2.w)
+                return 1;
+            return 0;
+        });
 
-    sbgnbbox.x = $(ele).find('bbox').attr('x');
-    sbgnbbox.y = $(ele).find('bbox').attr('y');
-    sbgnbbox.w = $(ele).find('bbox').attr('w');
-    sbgnbbox.h = $(ele).find('bbox').attr('h');
+        return compartments;
+    },
 
-    //set positions as center
-    sbgnbbox.x = parseFloat(sbgnbbox.x) + parseFloat(sbgnbbox.w)/2 - xPos;
-    sbgnbbox.y = parseFloat(sbgnbbox.y) + parseFloat(sbgnbbox.h)/2 - yPos;
+    isInBoundingBox : function(bbox1, bbox2){
+        if(bbox1.x > bbox2.x && 
+            bbox1.y > bbox2.y &&
+            bbox1.x + bbox1.w < bbox2.x + bbox2.w &&
+            bbox1.y + bbox1.h < bbox2.y + bbox2.h)
+            return true;
+        return false;
+    },
 
-    return sbgnbbox;
-};
+    bboxProp : function(ele){
+        var sbgnbbox = new Object();
 
-function stateAndInfoProp(ele, parentBbox){
-    var stateAndInfoArray = new Array();
+        sbgnbbox.x = $(ele).find('bbox').attr('x');
+        sbgnbbox.y = $(ele).find('bbox').attr('y');
+        sbgnbbox.w = $(ele).find('bbox').attr('w');
+        sbgnbbox.h = $(ele).find('bbox').attr('h');
 
-    $(ele).children('glyph').each(function(){
-        var obj = new Object();
-        if($(this).attr('class') === 'unit of information'){
-            obj.id = $(this).attr('id');
-            obj.clazz = $(this).attr('class');
-            obj.label = {'text' : $(this).find('label').attr('text')};
-            obj.bbox = stateAndInfoBboxProp(this, parentBbox);
-            stateAndInfoArray.push(obj);
-        }
-        else if($(this).attr('class') === 'state variable'){
-            obj.id = $(this).attr('id');
-            obj.clazz = $(this).attr('class');
-            obj.state = {'value' : $(this).find('state').attr('value'),
-                'variable' : $(this).find('state').attr('variable')};
-            obj.bbox = stateAndInfoBboxProp(this, parentBbox);
-            stateAndInfoArray.push(obj);
-        }
-    });
+        //set positions as center
+        sbgnbbox.x = parseFloat(sbgnbbox.x) + parseFloat(sbgnbbox.w)/2;
+        sbgnbbox.y = parseFloat(sbgnbbox.y) + parseFloat(sbgnbbox.h)/2;
 
-    return stateAndInfoArray;
-};
+        return sbgnbbox;
+    },
 
-function addCytoscapeJsNode(ele, jsonArray, parent){
-    var nodeObj = new Object();
+    stateAndInfoBboxProp : function(ele, parentBbox){
+        var xPos = parseFloat(parentBbox.x);
+        var yPos = parseFloat(parentBbox.y);
 
-    nodeObj.id = $(ele).attr('id');
-    nodeObj.sbgnbbox = bboxProp(ele);
-    nodeObj.sbgnclass = $(ele).attr('class');
+        var sbgnbbox = new Object();
 
-    if($(ele).find('clone').length > 0)
-        nodeObj.sbgnclonemarker = true;
-    else
-        nodeObj.sbgnclonemarker = null;
+        sbgnbbox.x = $(ele).find('bbox').attr('x');
+        sbgnbbox.y = $(ele).find('bbox').attr('y');
+        sbgnbbox.w = $(ele).find('bbox').attr('w');
+        sbgnbbox.h = $(ele).find('bbox').attr('h');
 
-    nodeObj.sbgnlabel = $(ele).find('label').attr('text');
-    nodeObj.sbgnstatesandinfos = stateAndInfoProp(ele, nodeObj.sbgnbbox);
+        //set positions as center
+        sbgnbbox.x = parseFloat(sbgnbbox.x) + parseFloat(sbgnbbox.w)/2 - xPos;
+        sbgnbbox.y = parseFloat(sbgnbbox.y) + parseFloat(sbgnbbox.h)/2 - yPos;
 
-    if(parent == ""){
-        if(typeof $(ele).attr('compartmentRef') === 'undefined')
-            nodeObj.parent = "";
+        return sbgnbbox;
+    },
+
+    stateAndInfoProp : function(ele, parentBbox){
+        var self = this;
+        var stateAndInfoArray = new Array();
+
+        $(ele).children('glyph').each(function(){
+            var obj = new Object();
+            if($(this).attr('class') === 'unit of information'){
+                obj.id = $(this).attr('id');
+                obj.clazz = $(this).attr('class');
+                obj.label = {'text' : $(this).find('label').attr('text')};
+                obj.bbox = self.stateAndInfoBboxProp(this, parentBbox);
+                stateAndInfoArray.push(obj);
+            }
+            else if($(this).attr('class') === 'state variable'){
+                obj.id = $(this).attr('id');
+                obj.clazz = $(this).attr('class');
+                obj.state = {'value' : $(this).find('state').attr('value'),
+                    'variable' : $(this).find('state').attr('variable')};
+                obj.bbox = self.stateAndInfoBboxProp(this, parentBbox);
+                stateAndInfoArray.push(obj);
+            }
+        });
+
+        return stateAndInfoArray;
+    },
+
+    addCytoscapeJsNode : function(ele, jsonArray, parent, compartments){
+        var self = this;
+        var nodeObj = new Object();
+
+        nodeObj.id = $(ele).attr('id');
+        nodeObj.sbgnbbox = self.bboxProp(ele);
+        nodeObj.sbgnclass = $(ele).attr('class');
+
+        if($(ele).find('clone').length > 0)
+            nodeObj.sbgnclonemarker = true;
         else
-            nodeObj.parent = $(ele).attr('compartmentRef');            
-    }
-    else{
-        nodeObj.parent = parent;
-    }
+            nodeObj.sbgnclonemarker = null;
 
-    var cytoscapeJsNode = {data : nodeObj};
-    jsonArray.push(cytoscapeJsNode);
-};
+        nodeObj.sbgnlabel = $(ele).find('label').attr('text');
+        nodeObj.sbgnstatesandinfos = self.stateAndInfoProp(ele, nodeObj.sbgnbbox);
 
-function traverseNodes(ele, jsonArray, parent){
-    //add complex nodes here
-    if($(ele).attr('class') === 'complex' || $(ele).attr('class') === 'submap'){
-        addCytoscapeJsNode(ele, jsonArray, parent);
+        //there is no complex parent
+        if(parent == ""){
+            //no compartment reference
+            if(typeof $(ele).attr('compartmentRef') === 'undefined'){
+                nodeObj.parent = "";
 
-        $(ele).children('glyph').each(function(){
-            if($(this).attr('class') != 'state variable' && 
-                $(this).attr('class') != 'unit of information'){
-                traverseNodes(this, jsonArray, $(ele).attr('id'));
+                //add compartment according to geometry
+                var control = false;
+
+                for(var i = 0 ; i < compartments.length ; i++){
+                    var bbox = {
+                        'x' : parseFloat($(ele).children('bbox').attr('x')),
+                        'y' : parseFloat($(ele).children('bbox').attr('y')),
+                        'w' : parseFloat($(ele).children('bbox').attr('w')),
+                        'h' : parseFloat($(ele).children('bbox').attr('h')),
+                        'id' : $(ele).attr('id')
+                    }
+                    if(self.isInBoundingBox(bbox, compartments[i])){
+                        nodeObj.parent = compartments[i].id;
+                        break;
+                    }
+                }
             }
-        });
-    }
-    else{
-        addCytoscapeJsNode(ele, jsonArray, parent);
-    }
-};
-
-function getArcSourceAndTarget(arc, xmlObject){
-    //source and target can be inside of a port
-    var source = $(arc).attr('source');
-    var target = $(arc).attr('target');
-    var sourceNodeId, targetNodeId;
-
-    $(xmlObject).find('glyph').each(function(){
-        if($(this).attr('id') == source){
-            sourceNodeId = source;
+            //there is compartment reference
+            else{
+                nodeObj.parent = $(ele).attr('compartmentRef');
+            }
         }
-        else if($(this).attr('id') == target){
-            targetNodeId = target;
+        //there is complex parent
+        else{
+            nodeObj.parent = parent;
         }
-    });
 
-    if(typeof sourceNodeId === 'undefined'){
-        $(xmlObject).find("port").each(function(){
+        var cytoscapeJsNode = {data : nodeObj};
+        jsonArray.push(cytoscapeJsNode);
+    },
+
+    traverseNodes : function(ele, jsonArray, parent, compartments){
+        var self = this;
+        //add complex nodes here
+        if($(ele).attr('class') === 'complex' || $(ele).attr('class') === 'submap'){
+            self.addCytoscapeJsNode(ele, jsonArray, parent, compartments);
+
+            $(ele).children('glyph').each(function(){
+                if($(this).attr('class') != 'state variable' && 
+                    $(this).attr('class') != 'unit of information'){
+                    self.traverseNodes(this, jsonArray, $(ele).attr('id'), compartments);
+                }
+            });
+        }
+        else{
+            self.addCytoscapeJsNode(ele, jsonArray, parent, compartments);
+        }
+    },
+
+    getArcSourceAndTarget : function(arc, xmlObject){
+        //source and target can be inside of a port
+        var source = $(arc).attr('source');
+        var target = $(arc).attr('target');
+        var sourceNodeId, targetNodeId;
+
+        $(xmlObject).find('glyph').each(function(){
             if($(this).attr('id') == source){
-                sourceNodeId = $(this).parent().attr('id');
+                sourceNodeId = source;
+            }
+            else if($(this).attr('id') == target){
+                targetNodeId = target;
             }
         });
-    }
 
-    if(typeof targetNodeId === 'undefined'){
-        $(xmlObject).find("port").each(function(){
-            if($(this).attr('id') == target){
-                targetNodeId = $(this).parent().attr('id');
-            }
+        if(typeof sourceNodeId === 'undefined'){
+            $(xmlObject).find("port").each(function(){
+                if($(this).attr('id') == source){
+                    sourceNodeId = $(this).parent().attr('id');
+                }
+            });
+        }
+
+        if(typeof targetNodeId === 'undefined'){
+            $(xmlObject).find("port").each(function(){
+                if($(this).attr('id') == target){
+                    targetNodeId = $(this).parent().attr('id');
+                }
+            });
+        }
+
+        return {'source' : sourceNodeId, 'target' : targetNodeId};
+    },
+
+    addCytoscapeJsEdge : function(ele, jsonArray, xmlObject){
+        var self = this;
+        var edgeObj = new Object();
+
+        edgeObj.id = $(ele).attr('id');
+        edgeObj.sbgnclass = $(ele).attr('class');
+
+        if($(ele).find('glyph').length <= 0){
+            edgeObj.sbgncardinality = 0;
+        }
+        else{
+            $(ele).children('glyph').each(function(){
+                if($(this).attr('class') != 'cardinality'){
+                    edgeObj.sbgncardinality = $(this).find('label').attr('text');
+                }
+            });
+        }
+
+        var sourceAndTarget = self.getArcSourceAndTarget(ele, xmlObject);
+
+        edgeObj.source = sourceAndTarget.source;
+        edgeObj.target = sourceAndTarget.target;
+
+        var cytoscapeJsEdge = {data : edgeObj};
+        jsonArray.push(cytoscapeJsEdge);
+    },
+
+    convert : function(xmlObject) {
+        var self = this;
+        var cytoscapeJsNodes = [];
+        var cytoscapeJsEdges = [];
+
+        var compartments = self.getAllCompartments(xmlObject);
+
+        $(xmlObject).find("map").children('glyph').each(function(){
+            self.traverseNodes(this, cytoscapeJsNodes, "", compartments);
         });
-    }
 
-    return {'source' : sourceNodeId, 'target' : targetNodeId};
-};
-
-function addCytoscapeJsEdge(ele, jsonArray, xmlObject){
-    var edgeObj = new Object();
-
-    edgeObj.id = $(ele).attr('id');
-    edgeObj.sbgnclass = $(ele).attr('class');
-
-    if($(ele).find('glyph').length <= 0){
-        edgeObj.sbgncardinality = 0;
-    }
-    else{
-        $(ele).children('glyph').each(function(){
-            if($(this).attr('class') != 'cardinality'){
-                edgeObj.sbgncardinality = $(this).find('label').attr('text');
-            }
+        $(xmlObject).find("map").children('arc').each(function(){
+            self.addCytoscapeJsEdge(this, cytoscapeJsEdges, xmlObject);
         });
+
+        var cytoscapeJsGraph = new Object();
+        cytoscapeJsGraph.nodes = cytoscapeJsNodes;
+        cytoscapeJsGraph.edges = cytoscapeJsEdges;
+
+        return cytoscapeJsGraph;
     }
-
-    var sourceAndTarget = getArcSourceAndTarget(ele, xmlObject);
-
-    edgeObj.source = sourceAndTarget.source;
-    edgeObj.target = sourceAndTarget.target;
-
-    var cytoscapeJsEdge = {data : edgeObj};
-    jsonArray.push(cytoscapeJsEdge);
-};
-
-function sbgnmlToJson(xmlObject) {
-    var cytoscapeJsNodes = new Array();
-    var cytoscapeJsEdges = new Array();
-
-    $(xmlObject).find("map").children('glyph').each(function(){
-        traverseNodes(this, cytoscapeJsNodes, "");
-    });
-
-    $(xmlObject).find("map").children('arc').each(function(){
-        addCytoscapeJsEdge(this, cytoscapeJsEdges, xmlObject);
-    });
-
-    var cytoscapeJsGraph = new Object();
-    cytoscapeJsGraph.nodes = cytoscapeJsNodes;
-    cytoscapeJsGraph.edges = cytoscapeJsEdges;
-
-    return cytoscapeJsGraph;
 };

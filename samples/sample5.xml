@@ -1,187 +1,357 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<sbgn xmlns="http://sbgn.org/libsbgn/0.2">
-    <map language="process description">
-        <glyph id="http___purl.org_pc2_4_Protein_b41e82a63cef2cd030834b769ccbed16" class="macromolecule">
-            <label text="Cbp/p300"/>
-            <bbox y="50.789948" x="62.11579" h="20.0" w="48.0"/>
-            <glyph id="http___purl.org_pc2_4_Protein_b41e82a63cef2cd030834b769ccbed16.state.1" class="state variable">
-                <state value="Ina"/>
-                <bbox y="63.289948" x="75.61579" h="15.0" w="21.0"/>
+<sbgn xmlns="http://sbgn.org/libsbgn/pd/0.1">
+    <map>
+        <glyph id="glyph1" class="compartment">
+            <label text="cytosol">
+                <bbox y="195.0" x="623.5" h="23.0" w="73.0"/>
+            </label>
+            <bbox y="180.0" x="40.0" h="1000.0" w="1240.0"/>
+        </glyph>
+        <glyph id="glyph40" class="compartment">
+            <label text="extracellular">
+                <bbox y="55.0" x="601.0" h="23.0" w="118.0"/>
+            </label>
+            <bbox y="40.0" x="40.0" h="120.0" w="1240.0"/>
+        </glyph>
+        <glyph id="glyph2" class="macromolecule">
+            <label text="IGFR"/>
+            <bbox y="200.0" x="70.0" h="60.0" w="100.0"/>
+        </glyph>
+        <glyph id="glyph0" class="macromolecule">
+            <label text="IGF"/>
+            <bbox y="80.0" x="120.0" h="60.0" w="100.0"/>
+        </glyph>
+        <glyph id="glyph6" class="association">
+            <bbox y="220.0" x="230.0" h="20.0" w="20.0"/>
+            <port id="glyph6.1" y="230.0" x="220.0"/>
+            <port id="glyph6.2" y="230.0" x="260.0"/>
+        </glyph>
+        <glyph id="glyph5" class="complex">
+            <bbox y="100.0" x="310.0" h="160.0" w="140.0"/>
+            <glyph id="glyph3" class="macromolecule">
+                <label text="IGF"/>
+                <bbox y="121.0" x="330.0" h="60.0" w="100.0"/>
+            </glyph>
+            <glyph id="glyph4" class="macromolecule">
+                <label text="IGFR"/>
+                <bbox y="182.0" x="330.0" h="60.0" w="100.0"/>
             </glyph>
         </glyph>
-        <glyph id="http___purl.org_pc2_4_Protein_2539f0bf9e0f7999f814b469369fee6c" class="macromolecule">
-            <label text="Cbp/p300"/>
-            <bbox y="13.719072" x="291.87222" h="20.0" w="48.0"/>
+        <glyph id="glyph9" class="simple chemical">
+            <label text="ATP"/>
+            <clone/>
+            <bbox y="290.0" x="270.0" h="60.0" w="60.0"/>
         </glyph>
-        <glyph id="http___purl.org_pc2_4_ComplexAssembly_1821e3e10b58dd5656bd46a4ec064bd1LEFT_TO_RIGHT" class="process">
-            <bbox y="17.838066" x="161.89061" h="15.0" w="15.0"/>
-            <port y="0.0" x="0.0" id="http___purl.org_pc2_4_ComplexAssembly_1821e3e10b58dd5656bd46a4ec064bd1LEFT_TO_RIGHT.input"/>
-            <port y="0.0" x="0.0" id="http___purl.org_pc2_4_ComplexAssembly_1821e3e10b58dd5656bd46a4ec064bd1LEFT_TO_RIGHT.output"/>
+        <glyph id="glyph10" class="simple chemical">
+            <label text="ADP"/>
+            <clone/>
+            <bbox y="290.0" x="420.0" h="60.0" w="60.0"/>
         </glyph>
-        <glyph id="http___purl.org_pc2_4_Protein_6c418787dd36c06af45aec41e43eebaf" class="macromolecule">
-            <label text="PML"/>
-            <bbox y="10.294924" x="232.36465" h="20.0" w="48.0"/>
-        </glyph>
-        <glyph id="SAS_For_http___purl.org_pc2_4_TemplateReaction_8ade9f6542a17b6fa9e17e239952c44f" class="source and sink">
-            <bbox y="37.46317" x="259.54227" h="15.0" w="15.0"/>
-        </glyph>
-        <glyph id="http___purl.org_pc2_4_Protein_3946c1c3f0a0d3ae63840f036eaa7ae5" class="macromolecule">
-            <label text="CREBBP"/>
-            <bbox y="15.847855" x="92.358284" h="20.0" w="48.0"/>
-        </glyph>
-        <glyph id="http___purl.org_pc2_4_Protein_437cebfde810b5be6e9488030045872c" class="macromolecule">
-            <label text="Cbp/p300"/>
-            <bbox y="11.543074" x="352.61652" h="20.0" w="48.0"/>
-            <glyph id="http___purl.org_pc2_4_Protein_437cebfde810b5be6e9488030045872c.state.1" class="state variable">
-                <state value="Act"/>
-                <bbox y="24.043074" x="366.11652" h="15.0" w="21.0"/>
+        <glyph id="glyph12" class="macromolecule">
+            <label text="Grb2"/>
+            <bbox y="510.0" x="590.0" h="60.0" w="100.0"/>
+            <glyph id="glyph12a" class="state variable">
+    			<state value="inactive"/>
+                <bbox y="556.0" x="610.0" h="28.0" w="60.0"/>
             </glyph>
         </glyph>
-        <glyph id="http___purl.org_pc2_4_Protein_f2a750f4ecc9d9791333555b6e191ea1" class="macromolecule">
-            <label text="EP300"/>
-            <bbox y="14.95173" x="197.05147" h="20.0" w="48.0"/>
+        <glyph id="glyph13" class="process">
+            <bbox y="530.0" x="510.0" h="20.0" w="20.0"/>
+            <port id="glyph13.2" y="540.0" x="540.0"/>
+            <port id="glyph13.1" y="540.0" x="500.0"/>
         </glyph>
-        <glyph id="http___purl.org_pc2_4_TemplateReaction_8ade9f6542a17b6fa9e17e239952c44f" class="process">
-            <bbox y="42.0103" x="169.95682" h="15.0" w="15.0"/>
-            <port y="0.0" x="0.0" id="http___purl.org_pc2_4_TemplateReaction_8ade9f6542a17b6fa9e17e239952c44f.input"/>
-            <port y="0.0" x="0.0" id="http___purl.org_pc2_4_TemplateReaction_8ade9f6542a17b6fa9e17e239952c44f.output"/>
-        </glyph>
-        <glyph id="http___purl.org_pc2_4_BiochemicalReaction_af2577611445117ab58cb16900f0b78cLEFT_TO_RIGHT" class="process">
-            <bbox y="18.172813" x="445.37158" h="15.0" w="15.0"/>
-            <port y="0.0" x="0.0" id="http___purl.org_pc2_4_BiochemicalReaction_af2577611445117ab58cb16900f0b78cLEFT_TO_RIGHT.input"/>
-            <port y="0.0" x="0.0" id="http___purl.org_pc2_4_BiochemicalReaction_af2577611445117ab58cb16900f0b78cLEFT_TO_RIGHT.output"/>
-        </glyph>
-        <glyph id="nuclear_body" class="compartment">
-            <label text="nuclear_body"/>
-            <bbox y="118.28107" x="26.08091" h="28.0" w="108.99999"/>
-        </glyph>
-        <glyph id="nucleus" class="compartment">
-            <label text="nucleus"/>
-            <bbox y="84.97214" x="236.47519" h="537.3495" w="521.6255"/>
-        </glyph>
-        <glyph compartmentRef="nuclear_body" id="http___purl.org_pc2_4_Complex_0ce9f26ef53711406f5d99b613549cd6" class="complex">
-            <label text="TAp73a (tetramer)/PML"/>
-            <bbox y="120.28107" x="28.08091" h="24.0" w="104.99999"/>
-            <glyph compartmentRef="nuclear_body" id="http___purl.org_pc2_4_Protein_6c418787dd36c06af45aec41e43eebaf_http___purl.org_pc2_4_Complex_0ce9f26ef53711406f5d99b613549cd6" class="macromolecule">
-                <label text="PML"/>
-                <bbox y="122.28107" x="30.08091" h="20.0" w="48.0"/>
-            </glyph>
-            <glyph compartmentRef="nuclear_body" id="http___purl.org_pc2_4_Protein_996568a02c18ee669489f558faea5b84_http___purl.org_pc2_4_Complex_0ce9f26ef53711406f5d99b613549cd6" class="macromolecule">
-                <label text="TP73"/>
-                <bbox y="122.28107" x="83.08091" h="20.0" w="48.0"/>
+        <glyph id="glyph20" class="macromolecule">
+            <label text="RAS"/>
+            <bbox y="880.0" x="100.0" h="60.0" w="100.0"/>
+            <glyph id="glyph20a" class="state variable">
+    			<state value="inactive"/>
+                <bbox y="926.0" x="120.0" h="28.0" w="60.0"/>
             </glyph>
         </glyph>
-        <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Complex_c2a1ef8121a417d458d9c1cc2280b974" class="complex">
-            <label text="PML/sp100/SUMO1/p53"/>
-            <bbox y="215.20914" x="556.7618" h="49.0" w="105.0"/>
-            <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_20c4b7e0602a0ee97c22be17d50d3086_http___purl.org_pc2_4_Complex_c2a1ef8121a417d458d9c1cc2280b974" class="macromolecule">
-                <label text="SP100"/>
-                <bbox y="217.20914" x="558.7618" h="20.0" w="48.0"/>
+        <glyph id="glyph18" class="complex">
+            <bbox y="710.0" x="150.0" h="100.0" w="260.0"/>
+            <glyph id="glyph16" class="macromolecule">
+                <label text="SOS"/>
+                <bbox y="730.0" x="169.0" h="60.0" w="100.0"/>
             </glyph>
-            <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_1422fd3b933bb1b87e37ea5924175072_http___purl.org_pc2_4_Complex_c2a1ef8121a417d458d9c1cc2280b974" class="macromolecule">
-                <label text="SUMO1"/>
-                <bbox y="217.20914" x="611.7618" h="20.0" w="48.0"/>
-            </glyph>
-            <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_1265e18a92d5aeea6378cd0e3a0d2a09_http___purl.org_pc2_4_Complex_c2a1ef8121a417d458d9c1cc2280b974" class="macromolecule">
-                <label text="TP53"/>
-                <bbox y="242.20914" x="558.7618" h="20.0" w="48.0"/>
-            </glyph>
-            <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_1164aacf913d38869bcdf17dfee61560_http___purl.org_pc2_4_Complex_c2a1ef8121a417d458d9c1cc2280b974" class="macromolecule">
-                <label text="PML"/>
-                <bbox y="242.20914" x="611.7618" h="20.0" w="48.0"/>
-            </glyph>
-        </glyph>
-        <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Complex_2f18c5c8421755a5fc36c65423e031e0" class="complex">
-            <label text="PML/sp100/SUMO1/p53(+1)"/>
-            <bbox y="86.97214" x="651.1007" h="49.0" w="105.0"/>
-            <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_20c4b7e0602a0ee97c22be17d50d3086_http___purl.org_pc2_4_Complex_2f18c5c8421755a5fc36c65423e031e0" class="macromolecule">
-                <label text="SP100"/>
-                <bbox y="88.97214" x="653.1007" h="20.0" w="48.0"/>
-            </glyph>
-            <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_1422fd3b933bb1b87e37ea5924175072_http___purl.org_pc2_4_Complex_2f18c5c8421755a5fc36c65423e031e0" class="macromolecule">
-                <label text="SUMO1"/>
-                <bbox y="88.97214" x="706.1007" h="20.0" w="48.0"/>
-            </glyph>
-            <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_ee3a8310e300c51efaf3d5936cf704ed_http___purl.org_pc2_4_Complex_2f18c5c8421755a5fc36c65423e031e0" class="macromolecule">
-                <label text="TP53"/>
-                <bbox y="113.97214" x="653.1007" h="20.0" w="48.0"/>
-                <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_ee3a8310e300c51efaf3d5936cf704ed_http___purl.org_pc2_4_Complex_2f18c5c8421755a5fc36c65423e031e0.state.1" class="state variable">
-                    <state value="Act"/>
-                    <bbox y="126.47214" x="666.6007" h="15.0" w="21.0"/>
-                </glyph>
-            </glyph>
-            <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_1164aacf913d38869bcdf17dfee61560_http___purl.org_pc2_4_Complex_2f18c5c8421755a5fc36c65423e031e0" class="macromolecule">
-                <label text="PML"/>
-                <bbox y="113.97214" x="706.1007" h="20.0" w="48.0"/>
-            </glyph>
-        </glyph>
-        <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_e19f229bf0ccc25e8ec14c810cb64428" class="macromolecule">
-            <label text="CREBBP"/>
-            <bbox y="212.19539" x="473.30966" h="20.0" w="48.0"/>
-        </glyph>
-        <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Complex_02bb15cde89daf439659883b61b08574" class="complex">
-            <label text="TAp73a (tetramer)"/>
-            <bbox y="201.8893" x="238.47519" h="24.0" w="119.0"/>
-            <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_92d369a6fee79a1aefaab5766bae74ce_http___purl.org_pc2_4_Complex_02bb15cde89daf439659883b61b08574" class="macromolecule">
-                <label text="TP73"/>
-                <bbox y="203.8893" x="240.47519" h="20.0" w="115.0"/>
-                <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_92d369a6fee79a1aefaab5766bae74ce_http___purl.org_pc2_4_Complex_02bb15cde89daf439659883b61b08574.state.1" class="state variable">
-                    <state variable="K327" value="Ac"/>
-                    <bbox y="216.3893" x="245.47519" h="15.0" w="50.0"/>
-                </glyph>
-                <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_92d369a6fee79a1aefaab5766bae74ce_http___purl.org_pc2_4_Complex_02bb15cde89daf439659883b61b08574.state.2" class="state variable">
-                    <state variable="K321" value="Ac"/>
-                    <bbox y="216.3893" x="300.4752" h="15.0" w="50.0"/>
-                </glyph>
-                <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_92d369a6fee79a1aefaab5766bae74ce_http___purl.org_pc2_4_Complex_02bb15cde89daf439659883b61b08574.state.3" class="state variable">
-                    <state variable="K331" value="Ac"/>
-                    <bbox y="216.3893" x="355.4752" h="15.0" w="50.0"/>
+            <glyph id="glyph17" class="macromolecule">
+                <label text="Grb2"/>
+                <bbox y="730.0" x="290.0" h="60.0" w="100.0"/>
+                <glyph id="glyph17a" class="state variable">
+        			<state value="active"/>
+                    <bbox y="777.0" x="315.0" h="26.0" w="50.0"/>
                 </glyph>
             </glyph>
         </glyph>
-        <glyph compartmentRef="nucleus" id="http___purl.org_pc2_4_Protein_6ad007f610b0aeb5c3518cbd4ea66eb6" class="macromolecule">
-            <label text="Cbp/p300"/>
-            <bbox y="600.32166" x="686.5068" h="20.0" w="48.0"/>
+        <glyph id="glyph22" class="simple chemical">
+            <label text="GTP"/>
+            <bbox y="1000.0" x="170.0" h="60.0" w="60.0"/>
         </glyph>
-        <arc target="http___purl.org_pc2_4_ComplexAssembly_1821e3e10b58dd5656bd46a4ec064bd1LEFT_TO_RIGHT" source="http___purl.org_pc2_4_Protein_f2a750f4ecc9d9791333555b6e191ea1" id="http___purl.org_pc2_4_Protein_f2a750f4ecc9d9791333555b6e191ea1--to--http___purl.org_pc2_4_ComplexAssembly_1821e3e10b58dd5656bd46a4ec064bd1LEFT_TO_RIGHT" class="catalysis">
-            <start y="0.0" x="0.0"/>
-            <end y="0.0" x="0.0"/>
+        <glyph id="glyph19" class="process">
+            <bbox y="900.0" x="270.0" h="20.0" w="20.0"/>
+            <port id="glyph19.1" y="910.0" x="260.0"/>
+            <port id="glyph19.2" y="910.0" x="300.0"/>
+        </glyph>
+        <glyph id="glyph23" class="simple chemical">
+            <label text="GDP"/>
+            <bbox y="1000.0" x="340.0" h="60.0" w="60.0"/>
+        </glyph>
+        <glyph id="glyph29" class="simple chemical">
+            <label text="ADP"/>
+            <clone/>
+            <bbox y="630.0" x="940.0" h="60.0" w="60.0"/>
+        </glyph>
+        <glyph id="glyph28" class="simple chemical">
+            <label text="ATP"/>
+            <clone/>
+            <bbox y="630.0" x="800.0" h="60.0" w="60.0"/>
+        </glyph>
+        <glyph id="glyph33" class="simple chemical">
+            <label text="ADP"/>
+            <clone/>
+            <bbox y="860.0" x="1080.0" h="60.0" w="60.0"/>
+        </glyph>
+        <glyph id="glyph34" class="simple chemical">
+            <label text="ATP"/>
+            <clone/>
+            <bbox y="860.0" x="950.0" h="60.0" w="60.0"/>
+        </glyph>
+        <glyph id="glyph30" class="macromolecule">
+            <label text="RSK"/>
+            <bbox y="730.0" x="1000.0" h="60.0" w="100.0"/>
+            <glyph id="glyph30a" class="state variable">
+    			<state value="P"/>
+                <bbox y="749.0" x="1087.5" h="22.0" w="25.0"/>
+            </glyph>
+        </glyph>
+        <glyph id="glyph35" class="macromolecule">
+            <label text="c-Fos"/>
+            <bbox y="960.0" x="1150.0" h="60.0" w="100.0"/>
+            <glyph id="glyph35a" class="state variable">
+    			<state value="P"/>
+                <bbox y="979.0" x="1237.5" h="22.0" w="25.0"/>
+            </glyph>
+        </glyph>
+        <glyph id="glyph36" class="phenotype">
+            <label text="gene&#xA;transcription"/>
+            <bbox y="1080.0" x="1130.0" h="60.0" w="140.0"/>
+        </glyph>
+        <glyph id="glyph7" class="macromolecule">
+            <label text="IRS1-4"/>
+            <bbox y="380.0" x="470.0" h="60.0" w="100.0"/>
+            <glyph id="glyph7a" class="state variable">
+    			<state value="P"/>
+                <bbox y="399.0" x="557.5" h="22.0" w="25.0"/>
+            </glyph>
+        </glyph>
+        <glyph id="glyph31" class="macromolecule">
+            <label text="ERK"/>
+            <bbox y="880.0" x="820.0" h="60.0" w="100.0"/>
+            <glyph id="glyph31a" class="state variable">
+    			<state value="2P"/>
+                <bbox y="929.0" x="829.0" h="22.0" w="32.0"/>
+            </glyph>
+        </glyph>
+        <glyph id="glyph21" class="macromolecule">
+            <label text="RAS"/>
+            <bbox y="880.0" x="370.0" h="60.0" w="100.0"/>
+            <glyph id="glyph21a" class="state variable">
+    			<state value="active"/>
+                <bbox y="927.0" x="395.0" h="26.0" w="50.0"/>
+            </glyph>
+        </glyph>
+        <glyph id="glyph24" class="submap">
+            <label text="MAPK&#xA;cascade"/>
+            <bbox y="850.0" x="520.0" h="120.0" w="220.0"/>
+			<glyph id="glyph41" class="terminal"  orientation="right">
+				<label text="RAS"/>
+				<bbox y="887.0" x="520.0" h="45.0" w="80.0"/>
+			</glyph>
+			<glyph id="glyph42" class="terminal"  orientation="left">
+				<label text="ERK"/>
+				<bbox y="887.0" x="660.0" h="45.0" w="80.0"/>
+			</glyph>	
+        </glyph>
+        <glyph id="glyph37" class="macromolecule">
+            <label text="c-Fos"/>
+            <bbox y="960.0" x="850.0" h="60.0" w="100.0"/>
+            <glyph id="glyph37a" class="state variable">
+                <bbox y="979.0" x="940.0" h="22.0" w="20.0"/>
+            </glyph>
+        </glyph>
+        <glyph id="glyph32" class="process">
+            <bbox y="980.0" x="1040.0" h="20.0" w="20.0"/>
+            <port id="glyph32.2" y="990.0" x="1070.0"/>
+            <port id="glyph32.1" y="990.0" x="1030.0"/>
+        </glyph>
+        <glyph id="glyph38" class="macromolecule">
+            <label text="IRS1-4"/>
+            <bbox y="380.0" x="190.0" h="60.0" w="100.0"/>
+            <glyph id="glyph38a" class="state variable">
+                <bbox y="399.0" x="280.0" h="22.0" w="20.0"/>
+            </glyph>
+        </glyph>
+        <glyph id="glyph8" class="process">
+            <bbox y="400.0" x="370.0" h="20.0" w="20.0"/>
+            <port id="glyph8.1" y="410.0" x="360.0"/>
+            <port id="glyph8.2" y="410.0" x="400.0"/>
+        </glyph>
+        <glyph id="glyph39" class="macromolecule">
+            <label text="RSK"/>
+            <bbox y="730.0" x="700.0" h="60.0" w="100.0"/>
+            <glyph id="glyph39a" class="state variable">
+                <bbox y="749.0" x="790.0" h="22.0" w="20.0"/>
+            </glyph>
+        </glyph>
+        <glyph id="glyph27" class="process">
+            <bbox y="750.0" x="890.0" h="20.0" w="20.0"/>
+            <port id="glyph27.2" y="760.0" x="920.0"/>
+            <port id="glyph27.1" y="760.0" x="880.0"/>
+        </glyph>
+        <glyph id="glyph14" class="macromolecule">
+            <label text="SOS"/>
+            <bbox y="510.0" x="120.0" h="60.0" w="100.0"/>
+        </glyph>
+        <glyph id="glyph11" class="macromolecule">
+            <label text="Grb2"/>
+            <bbox y="510.0" x="340.0" h="60.0" w="100.0"/>
+            <glyph id="glyph11a" class="state variable">
+    			<state value="active"/>
+                <bbox y="557.0" x="365.0" h="26.0" w="50.0"/>
+            </glyph>
+        </glyph>
+        <glyph id="glyph15" orientation="vertical" class="association">
+            <bbox y="640.0" x="270.0" h="20.0" w="20.0"/>
+            <port id="glyph15.2" y="670.0" x="280.0"/>
+            <port id="glyph15.1" y="630.0" x="280.0"/>
+        </glyph>
+        <arc target="glyph6.1" source="glyph2" class="consumption">
+            <start y="230.0" x="170.0"/>
+            <end y="230.0" x="220.0"/>
         </arc>
-        <arc target="http___purl.org_pc2_4_ComplexAssembly_1821e3e10b58dd5656bd46a4ec064bd1LEFT_TO_RIGHT" source="http___purl.org_pc2_4_Complex_0ce9f26ef53711406f5d99b613549cd6" id="http___purl.org_pc2_4_Complex_0ce9f26ef53711406f5d99b613549cd6--to--http___purl.org_pc2_4_ComplexAssembly_1821e3e10b58dd5656bd46a4ec064bd1LEFT_TO_RIGHT.input" class="consumption">
-            <start y="0.0" x="0.0"/>
-            <end y="0.0" x="0.0"/>
+        <arc target="glyph5" source="glyph6.2" class="production">
+            <start y="230.0" x="260.0"/>
+            <end y="229.6" x="310.0"/>
         </arc>
-        <arc target="http___purl.org_pc2_4_Complex_2f18c5c8421755a5fc36c65423e031e0" source="http___purl.org_pc2_4_BiochemicalReaction_af2577611445117ab58cb16900f0b78cLEFT_TO_RIGHT" id="http___purl.org_pc2_4_BiochemicalReaction_af2577611445117ab58cb16900f0b78cLEFT_TO_RIGHT.output--to--http___purl.org_pc2_4_Complex_2f18c5c8421755a5fc36c65423e031e0" class="production">
-            <start y="0.0" x="0.0"/>
-            <end y="0.0" x="0.0"/>
+        <arc target="glyph6.1" source="glyph0" class="consumption">
+            <start y="140.0" x="182.5"/>
+            <end y="230.0" x="220.0"/>
         </arc>
-        <arc target="http___purl.org_pc2_4_Complex_02bb15cde89daf439659883b61b08574" source="http___purl.org_pc2_4_ComplexAssembly_1821e3e10b58dd5656bd46a4ec064bd1LEFT_TO_RIGHT" id="http___purl.org_pc2_4_ComplexAssembly_1821e3e10b58dd5656bd46a4ec064bd1LEFT_TO_RIGHT.output--to--http___purl.org_pc2_4_Complex_02bb15cde89daf439659883b61b08574" class="production">
-            <start y="0.0" x="0.0"/>
-            <end y="0.0" x="0.0"/>
+        <arc target="glyph8" source="glyph5" class="catalysis">
+            <start y="260.0" x="380.0"/>
+            <end y="400.0" x="380.0"/>
         </arc>
-        <arc target="http___purl.org_pc2_4_Protein_6c418787dd36c06af45aec41e43eebaf" source="http___purl.org_pc2_4_TemplateReaction_8ade9f6542a17b6fa9e17e239952c44f" id="http___purl.org_pc2_4_TemplateReaction_8ade9f6542a17b6fa9e17e239952c44f.output--to--http___purl.org_pc2_4_Protein_6c418787dd36c06af45aec41e43eebaf" class="production">
-            <start y="0.0" x="0.0"/>
-            <end y="0.0" x="0.0"/>
+        <arc target="glyph8.1" source="glyph9" class="consumption">
+            <start y="344.96152" x="316.641"/>
+            <end y="410.0" x="360.0"/>
         </arc>
-        <arc target="http___purl.org_pc2_4_TemplateReaction_8ade9f6542a17b6fa9e17e239952c44f" source="http___purl.org_pc2_4_Protein_f2a750f4ecc9d9791333555b6e191ea1" id="http___purl.org_pc2_4_Protein_f2a750f4ecc9d9791333555b6e191ea1--to--http___purl.org_pc2_4_TemplateReaction_8ade9f6542a17b6fa9e17e239952c44f" class="stimulation">
-            <start y="0.0" x="0.0"/>
-            <end y="0.0" x="0.0"/>
+        <arc target="glyph10" source="glyph8.2" class="production">
+            <start y="410.0" x="400.0"/>
+            <end y="343.68057" x="431.5818"/>
         </arc>
-        <arc target="http___purl.org_pc2_4_TemplateReaction_8ade9f6542a17b6fa9e17e239952c44f" source="SAS_For_http___purl.org_pc2_4_TemplateReaction_8ade9f6542a17b6fa9e17e239952c44f" id="SAS_For_http___purl.org_pc2_4_TemplateReaction_8ade9f6542a17b6fa9e17e239952c44f--to--http___purl.org_pc2_4_TemplateReaction_8ade9f6542a17b6fa9e17e239952c44f.input" class="consumption">
-            <start y="0.0" x="0.0"/>
-            <end y="0.0" x="0.0"/>
+        <arc target="glyph13" source="glyph7" class="stimulation">
+            <start y="440.0" x="520.0"/>
+            <end y="530.0" x="520.0"/>
         </arc>
-        <arc target="http___purl.org_pc2_4_BiochemicalReaction_af2577611445117ab58cb16900f0b78cLEFT_TO_RIGHT" source="http___purl.org_pc2_4_Complex_c2a1ef8121a417d458d9c1cc2280b974" id="http___purl.org_pc2_4_Complex_c2a1ef8121a417d458d9c1cc2280b974--to--http___purl.org_pc2_4_BiochemicalReaction_af2577611445117ab58cb16900f0b78cLEFT_TO_RIGHT.input" class="consumption">
-            <start y="0.0" x="0.0"/>
-            <end y="0.0" x="0.0"/>
+        <arc target="glyph13.2" source="glyph12" class="consumption">
+            <start y="540.0" x="590.0"/>
+            <end y="540.0" x="540.0"/>
         </arc>
-        <arc target="http___purl.org_pc2_4_Protein_6c418787dd36c06af45aec41e43eebaf" source="http___purl.org_pc2_4_ComplexAssembly_1821e3e10b58dd5656bd46a4ec064bd1LEFT_TO_RIGHT" id="http___purl.org_pc2_4_ComplexAssembly_1821e3e10b58dd5656bd46a4ec064bd1LEFT_TO_RIGHT.output--to--http___purl.org_pc2_4_Protein_6c418787dd36c06af45aec41e43eebaf" class="production">
-            <start y="0.0" x="0.0"/>
-            <end y="0.0" x="0.0"/>
+        <arc target="glyph11" source="glyph13.1" class="production">
+            <start y="540.0" x="500.0"/>
+            <end y="540.0" x="440.0"/>
         </arc>
-        <arc target="http___purl.org_pc2_4_BiochemicalReaction_af2577611445117ab58cb16900f0b78cLEFT_TO_RIGHT" source="http___purl.org_pc2_4_Protein_e19f229bf0ccc25e8ec14c810cb64428" id="http___purl.org_pc2_4_Protein_e19f229bf0ccc25e8ec14c810cb64428--to--http___purl.org_pc2_4_BiochemicalReaction_af2577611445117ab58cb16900f0b78cLEFT_TO_RIGHT" class="catalysis">
-            <start y="0.0" x="0.0"/>
-            <end y="0.0" x="0.0"/>
+        <arc target="glyph18" source="glyph15.2" class="production">
+            <start y="670.0" x="280.0"/>
+            <end y="710.0" x="280.0"/>
+        </arc>
+        <arc target="glyph19.1" source="glyph20" class="consumption">
+            <start y="910.0" x="200.0"/>
+            <end y="910.0" x="260.0"/>
+        </arc>
+        <arc target="glyph21" source="glyph19.2" class="production">
+            <start y="910.0" x="300.0"/>
+            <end y="910.0" x="370.0"/>
+        </arc>
+        <arc target="glyph19" source="glyph18" class="stimulation">
+            <start y="810.0" x="280.0"/>
+            <end y="900.0" x="280.0"/>
+        </arc>
+        <arc target="glyph19.1" source="glyph22" class="consumption">
+            <start y="1003.1672" x="213.41641"/>
+            <end y="910.0" x="260.0"/>
+        </arc>
+        <arc target="glyph23" source="glyph19.2" class="production">
+            <start y="910.0" x="300.0"/>
+            <end y="1006.0" x="352.0"/>
+        </arc>
+        <arc target="glyph30" source="glyph27.2" class="production">
+            <start y="760.0" x="920.0"/>
+            <end y="760.0" x="1000.0"/>
+        </arc>
+        <arc target="glyph29" source="glyph27.2" class="production">
+            <start y="760.0" x="920.0"/>
+            <end y="684.57697" x="952.79614"/>
+        </arc>
+        <arc target="glyph27.1" source="glyph28" class="consumption">
+            <start y="686.8328" x="843.4164"/>
+            <end y="760.0" x="880.0"/>
+        </arc>
+        <arc target="glyph27" source="glyph31" class="catalysis">
+            <start y="880.0" x="876.0"/>
+            <end y="770.0" x="898.0"/>
+        </arc>
+        <arc target="glyph35" source="glyph32.2" class="production">
+            <start y="990.0" x="1070.0"/>
+            <end y="990.0" x="1150.0"/>
+        </arc>
+        <arc target="glyph33" source="glyph32.2" class="production">
+            <start y="990.0" x="1070.0"/>
+            <end y="915.7248" x="1094.5652"/>
+        </arc>
+        <arc target="glyph32.1" source="glyph34" class="consumption">
+            <start y="916.8328" x="993.4164"/>
+            <end y="990.0" x="1030.0"/>
+        </arc>
+        <arc target="glyph32" source="glyph30" class="catalysis">
+            <start y="790.0" x="1050.0"/>
+            <end y="980.0" x="1050.0"/>
+        </arc>
+        <arc target="glyph36" source="glyph35" class="stimulation">
+            <start y="1020.0" x="1200.0"/>
+            <end y="1080.0" x="1200.0"/>
+        </arc>
+        <arc target="glyph7" source="glyph8.2" class="production">
+            <start y="410.0" x="400.0"/>
+            <end y="410.0" x="470.0"/>
+        </arc>
+        <arc target="glyph42" source="glyph31" class="equivalence arc">
+            <start y="910.0" x="820.0"/>
+            <end y="910.0" x="740.0"/>
+        </arc>
+        <arc target="glyph41" source="glyph21" class="equivalence arc">
+            <start y="910.0" x="470.0"/>
+            <end y="910.0" x="520.0"/>
+        </arc>
+        <arc target="glyph32.1" source="glyph37" class="consumption">
+            <start y="990.0" x="957.0"/>
+            <end y="990.0" x="1030.0"/>
+        </arc>
+        <arc target="glyph8.1" source="glyph38" class="consumption">
+            <start y="410.0" x="297.0"/>
+            <end y="410.0" x="360.0"/>
+        </arc>
+        <arc target="glyph27.1" source="glyph39" class="consumption">
+            <start y="760.0" x="807.0"/>
+            <end y="760.0" x="880.0"/>
+        </arc>
+        <arc target="glyph15.1" source="glyph14" class="consumption">
+            <start y="570.0" x="206.66667"/>
+            <end y="630.0" x="280.0"/>
+        </arc>
+        <arc target="glyph15.1" source="glyph11" class="consumption">
+            <start y="570.0" x="353.33334"/>
+            <end y="630.0" x="280.0"/>
         </arc>
     </map>
 </sbgn>

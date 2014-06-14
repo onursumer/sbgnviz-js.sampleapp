@@ -1745,7 +1745,7 @@
 		var boxPadding = 10, betweenBoxPadding = 5;
 		var beginPosY = height / 2, beginPosX = width / 2;
 
-		stateAndInfos.sort($$.sbgn.compareStates);
+		stateAndInfos = stateAndInfos.sort($$.sbgn.compareStates);
 
 		for(var i = 0 ; i < stateAndInfos.length ; i++){
 			var state = stateAndInfos[i];

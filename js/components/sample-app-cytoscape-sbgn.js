@@ -134,6 +134,10 @@ var SBGNContainer = Backbone.View.extend({
                 cy.on('tap', 'node', function(evt){
                     var node = this;
                 });
+
+                cy.on('tap', 'edge', function(evt){
+                    var edge = this;
+                });
             }
 
         };

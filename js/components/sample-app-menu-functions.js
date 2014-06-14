@@ -40,8 +40,7 @@ $("#node-legend").click(function(e){
         'height' : 393,
         'transitionIn' : 'none',
         'transitionOut' : 'none',
-    }
-    );
+    });
 });
 
 $("#edge-legend").click(function(e){
@@ -54,8 +53,7 @@ $("#edge-legend").click(function(e){
         'height' : 220,
         'transitionIn' : 'none',
         'transitionOut' : 'none',
-    }
-    );
+    });
 });
 
 $("#about").click(function(e){
@@ -68,8 +66,7 @@ $("#about").click(function(e){
         'height' : 368,
         'transitionIn' : 'none',
         'transitionOut' : 'none',
-    }
-    );
+    });
 });
 
 $("#load-sample1").click(function(e){
@@ -167,11 +164,9 @@ $("#load-file").click(function(evt){
     $("#file-input").trigger('click');
 });
 
-$("#save-as-json").click(function(evt){
-    var pngContent = cy.json();
-    
-    var plainJson = JSON.stringify(pngContent);
-    window.open(plainJson, "_blank");
+$("#save-as-sbgnml").click(function(evt){
+    //TODO : add sbgn converter here
+    toSbgnml.createSbgnml();
 });
 
 

@@ -114,22 +114,8 @@ var sbgnmlToJson = {
         return stateAndInfoArray;
     },
 
-    addCytoscapeJsNode : function(ele, jsonArray, parent, compartments){
+    addParentInfoToNode : function(ele, nodeObj, parent, compartments){
         var self = this;
-        var nodeObj = new Object();
-
-        nodeObj.id = $(ele).attr('id');
-        nodeObj.sbgnbbox = self.bboxProp(ele);
-        nodeObj.sbgnclass = $(ele).attr('class');
-
-        if($(ele).find('clone').length > 0)
-            nodeObj.sbgnclonemarker = true;
-        else
-            nodeObj.sbgnclonemarker = null;
-
-        nodeObj.sbgnlabel = $(ele).find('label').attr('text');
-        nodeObj.sbgnstatesandinfos = self.stateAndInfoProp(ele, nodeObj.sbgnbbox);
-
         //there is no complex parent
         if(parent == ""){
             //no compartment reference
@@ -137,8 +123,6 @@ var sbgnmlToJson = {
                 nodeObj.parent = "";
 
                 //add compartment according to geometry
-                var control = false;
-
                 for(var i = 0 ; i < compartments.length ; i++){
                     var bbox = {
                         'x' : parseFloat($(ele).children('bbox').attr('x')),
@@ -162,6 +146,46 @@ var sbgnmlToJson = {
         else{
             nodeObj.parent = parent;
         }
+    },
+
+    addCytoscapeJsNode : function(ele, jsonArray, parent, compartments){
+        var self = this;
+        var nodeObj = new Object();
+
+        //add id information
+        nodeObj.id = $(ele).attr('id');
+        //add node bounding box information
+        nodeObj.sbgnbbox = self.bboxProp(ele);
+        //add class information
+        nodeObj.sbgnclass = $(ele).attr('class');
+        //add label information
+        nodeObj.sbgnlabel = $(ele).children('label').attr('text');
+        //add state and info box information
+        nodeObj.sbgnstatesandinfos = self.stateAndInfoProp(ele, nodeObj.sbgnbbox);
+        //adding parent information
+        self.addParentInfoToNode(ele, nodeObj, parent, compartments);
+
+        //add clone information
+        if($(ele).find('clone').length > 0)
+            nodeObj.sbgnclonemarker = true;
+        else
+            nodeObj.sbgnclonemarker = null;
+
+        //add port information
+        var ports = [];
+        $(ele).find('port').each(function(){
+            var id = $(this).attr('id');
+            var relativeXPos = parseFloat($(this).attr('x')) - nodeObj.sbgnbbox.x;
+            var relativeYPos = parseFloat($(this).attr('y')) - nodeObj.sbgnbbox.y;
+
+            ports.push({
+                id : $(this).attr('id'),
+                x : relativeXPos,
+                y : relativeYPos
+            });
+        });
+
+        nodeObj.ports = ports;
 
         var cytoscapeJsNode = {data : nodeObj};
         jsonArray.push(cytoscapeJsNode);
@@ -242,6 +266,9 @@ var sbgnmlToJson = {
         edgeObj.source = sourceAndTarget.source;
         edgeObj.target = sourceAndTarget.target;
 
+        edgeObj.portSource = $(ele).attr("source");
+        edgeObj.portTarget = $(ele).attr("target");
+
         var cytoscapeJsEdge = {data : edgeObj};
         jsonArray.push(cytoscapeJsEdge);
     },
@@ -268,3 +295,229 @@ var sbgnmlToJson = {
         return cytoscapeJsGraph;
     }
 };
+
+var toSbgnml = {
+    createSbgnml : function(){
+        var self = this;
+        var sbgnmlText = "";
+
+        //add headers
+        sbgnmlText = sbgnmlText + "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n";
+        sbgnmlText = sbgnmlText + "<sbgn xmlns='http://sbgn.org/libsbgn/pd/0.1'>\n";
+        sbgnmlText = sbgnmlText + "<map>\n";
+
+        //adding glyph sbgnml
+        cy.nodes().each(function(){
+            if(!this.isChild())
+                sbgnmlText = sbgnmlText + self.getGlyphSbgnml(this);
+        });
+
+        //adding arc sbgnml
+        cy.edges().each(function(){
+            sbgnmlText = sbgnmlText + self.getArcSbgnml(this);
+        });
+
+        sbgnmlText = sbgnmlText + "</map>\n";
+        sbgnmlText = sbgnmlText + "</sbgn>\n";
+
+        return sbgnmlText;
+    },
+
+    getGlyphSbgnml : function(node){
+        var self = this;
+        var sbgnmlText = "";
+
+        if(node._private.data.sbgnclass === "compartment"){
+            sbgnmlText = sbgnmlText + 
+                "<glyph id='" + node._private.data.id + "' class='compartment' ";
+
+            if(node.parent().isParent()){
+                var parent = node.parent();
+                sbgnmlText = sbgnmlText + " compartmentRef='" + node._private.data.id + "'";
+            }
+
+            sbgnmlText = sbgnmlText + " >\n";
+
+            sbgnmlText = sbgnmlText + this.addCommonGlyphProperties(node);
+
+            sbgnmlText = sbgnmlText + "</glyph>\n";
+
+            node.children().each(function(){
+                sbgnmlText = sbgnmlText + self.getGlyphSbgnml(this);
+            });
+        }
+        else if(node._private.data.sbgnclass === "complex" || node._private.data.sbgnclass === "submap"){
+            sbgnmlText = sbgnmlText + 
+                "<glyph id='" + node._private.data.id + "' class='" + node._private.data.sbgnclass + "' ";
+
+            if(node.parent().isParent()){
+                var parent = node.parent()[0];
+                if(parent._private.data.sbgnclass == "compartment")
+                    sbgnmlText = sbgnmlText + " compartmentRef='" + parent._private.data.id + "'";
+            }
+            sbgnmlText = sbgnmlText + " >\n";
+
+            sbgnmlText = sbgnmlText + self.addCommonGlyphProperties(node);
+
+            node.children().each(function(){
+                sbgnmlText = sbgnmlText + self.getGlyphSbgnml(this);
+            });
+
+            sbgnmlText = sbgnmlText + "</glyph>\n";
+        }
+        else{//it is a simple node
+            sbgnmlText = sbgnmlText + 
+                "<glyph id='" + node._private.data.id + "' class='" + node._private.data.sbgnclass + "'";
+
+            if(node.parent().isParent()){
+                var parent = node.parent()[0];
+                if(parent._private.data.sbgnclass == "compartment")
+                    sbgnmlText = sbgnmlText + " compartmentRef='" + parent._private.data.id + "'";
+            }
+
+            sbgnmlText = sbgnmlText + " >\n";
+
+            sbgnmlText = sbgnmlText + self.addCommonGlyphProperties(node);
+
+            sbgnmlText = sbgnmlText + "</glyph>\n";
+        }
+            
+        return  sbgnmlText;
+    },
+
+    addCommonGlyphProperties : function(node){
+        var sbgnmlText = "";
+
+        //add label information
+        sbgnmlText = sbgnmlText + this.addLabel(node);
+        //add bbox information
+        sbgnmlText = sbgnmlText + this.addGlyphBbox(node);
+        //add port information
+        sbgnmlText = sbgnmlText + this.addPort(node);
+        //add state and info box information
+        sbgnmlText = sbgnmlText + this.getStateAndInfoSbgnml(node);
+
+        return sbgnmlText;
+    },
+
+    getStateAndInfoSbgnml : function(node){
+        var sbgnmlText = "";
+
+        for(var i = 0 ; i < node._private.data.sbgnstatesandinfos.length ; i++){
+            var boxGlyph = node._private.data.sbgnstatesandinfos[i];
+            if(boxGlyph.clazz === "state variable"){
+                sbgnmlText = sbgnmlText + this.addStateBoxGlyph(boxGlyph, node);
+            }
+            else if(boxGlyph.clazz === "unit of information"){
+                sbgnmlText = sbgnmlText + this.addInfoBoxGlyph(boxGlyph, node);
+            }
+        }
+        return sbgnmlText;
+    },
+
+    getArcSbgnml : function(edge){
+        var sbgnmlText = "";
+
+        sbgnmlText = sbgnmlText + "<arc target='" + edge._private.data.portTarget +
+            "' source='" + edge._private.data.portSource + "' class='" +
+            edge._private.data.sbgnclass + "'>\n";
+
+        sbgnmlText = sbgnmlText + "<start y='" + edge._private.rscratch.startY + "' x='" +
+            edge._private.rscratch.startX + "'/>\n";
+
+        sbgnmlText = sbgnmlText + "<end y='" + edge._private.rscratch.endY + "' x='" +
+            edge._private.rscratch.endX + "'/>\n";
+
+        sbgnmlText = sbgnmlText + "</arc>\n";
+
+        return sbgnmlText;
+    },
+
+    addGlyphBbox : function(node){
+        var bbox = node._private.data.sbgnbbox;
+        var x = node._private.position.x - bbox.w/2;
+        var y = node._private.position.y - bbox.h/2;
+        return "<bbox y='" + y + "' x='" + x + 
+            "' w='" + bbox.w + "' h='" + bbox.h + "' />\n";
+    },
+
+    addStateAndInfoBbox : function(node, boxGlyph){
+        boxBbox = boxGlyph.bbox;
+        var x = node._private.position.x + (boxBbox.x - boxBbox.w/2);
+        var y = node._private.position.y + (boxBbox.y - boxBbox.h/2);
+        return "<bbox y='" + y + "' x='" + x + 
+            "' w='" + boxBbox.w + "' h='" + boxBbox.h + "' />\n";
+    },
+
+    addPort : function(node){
+        var sbgnmlText = "";
+
+        var ports = node._private.data.ports;
+        for(var i = 0 ; i < ports.length ; i++){
+            var x = node._private.position.x + ports[i].x;
+            var y = node._private.position.y + ports[i].y;
+
+            sbgnmlText = sbgnmlText + "<port id='" + ports[i].id + 
+                "' y='" + y + "' x='" + x + "' />\n";
+        }
+        return sbgnmlText;
+    },
+
+    addLabel : function(node){
+        var label = node._private.data.sbgnlabel;
+
+        if(typeof label != 'undefined')
+            return "<label text='" + label + "' />\n";
+        return "";
+    },
+
+    addStateBoxGlyph : function(node, mainGlyph){
+        var sbgnmlText = "";
+
+        sbgnmlText = sbgnmlText + "<glyph id='" + node.id + "' class='state variable'>\n";
+        sbgnmlText = sbgnmlText + "<state ";
+
+        if(typeof node.state.value != 'undefined')
+            sbgnmlText = sbgnmlText + "value='" + node.state.value + "' ";
+        if(node.state.variable != 'undefined')
+            sbgnmlText = sbgnmlText + "variable='" + node.state.variable + "' ";
+        sbgnmlText = sbgnmlText + "/>\n";
+        
+        sbgnmlText = sbgnmlText + this.addStateAndInfoBbox(mainGlyph, node);
+        sbgnmlText = sbgnmlText + "</glyph>\n";
+
+        return sbgnmlText;
+    },
+
+    addInfoBoxGlyph : function(node, mainGlyph){
+        var sbgnmlText = "";
+
+        sbgnmlText = sbgnmlText + "<glyph id='" + node.id + "' class='unit of information'>\n";
+        sbgnmlText = sbgnmlText + "<label ";
+
+        if(typeof node.label.text != 'undefined')
+            sbgnmlText = sbgnmlText + "text='" + node.label.text + "' ";
+        sbgnmlText = sbgnmlText + "/>\n";
+        
+        sbgnmlText = sbgnmlText + this.addStateAndInfoBbox(mainGlyph, node);
+        sbgnmlText = sbgnmlText + "</glyph>\n";
+
+        return sbgnmlText;
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

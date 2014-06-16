@@ -3950,11 +3950,14 @@
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var padding = node._private.style["border-width"].pxValue / 2;
+			var padding = node._private.style["border-width"].pxValue;
 
-			nodeShapes['ellipse'].drawPath(context, centerX, centerY, width, height);
+			var oldStyle = context.fillStyle;
 			context.fillStyle = '#000000';
-			context.fill();
+			nodeShapes['ellipse'].draw(context, centerX, centerY, width, height);
+			context.fillStyle = oldStyle;
+	    	nodeShapes['ellipse'].drawPath(context, centerX, centerY, width, height);
+			context.stroke();
 	    },
 	    
 	    drawPath: function(context, node) {

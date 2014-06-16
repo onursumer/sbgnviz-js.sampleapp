@@ -1667,6 +1667,7 @@
 
 	$$.sbgn.drawEllipse = function(context, x, y, width, height){
 		//$$.sbgn.drawEllipsePath(context, x, y, width, height);
+		//context.fill();
 		nodeShapes['ellipse'].draw(context, x, y, width, height);
 	};
 
@@ -1724,8 +1725,9 @@
 
 				textProp.label = state.label.text;
 				$$.sbgn.drawInfoText(context, textProp);
-					infoCount++;
-					context.stroke();
+				
+				infoCount++;
+				context.stroke();
 			}
 		}
 	};
@@ -1745,7 +1747,7 @@
 		var boxPadding = 10, betweenBoxPadding = 5;
 		var beginPosY = height / 2, beginPosX = width / 2;
 
-		stateAndInfos = stateAndInfos.sort($$.sbgn.compareStates);
+		stateAndInfos.sort($$.sbgn.compareStates);
 
 		for(var i = 0 ; i < stateAndInfos.length ; i++){
 			var state = stateAndInfos[i];
@@ -1792,7 +1794,7 @@
 						'opacity':node._private.style['text-opacity'].value, 'width': stateWidth};
 
 					if(state.clazz == "state variable"){//draw ellipse
-						$$.sbgn.drawEllipsePath(context,
+						$$.sbgn.drawEllipse(context,
 							stateCenterX, stateCenterY, 
 							stateWidth, stateHeight);
 
@@ -2647,6 +2649,7 @@
 				width, height, cornerLength, cloneMarker, false);
 
 			$$.sbgn.drawComplexStateAndInfo(context, node, stateAndInfos, centerX, centerY, width, height);
+
 		},
 
 		drawPath: function(context, node) {
@@ -3651,7 +3654,7 @@
 			var width = node.width();
 			var height = node.height();
 
-			$$.sbgn.drawEllipsePath(context, centerX, centerY, width, height);
+			$$.sbgn.drawEllipse(context, centerX, centerY, width, height);
 
 			context.stroke();
 
@@ -3699,7 +3702,6 @@
 
 			return nodeShapes['ellipse'].checkPoint(x, y, padding, width,
 				height, centerX, centerY);
-
 		}
 	};
 

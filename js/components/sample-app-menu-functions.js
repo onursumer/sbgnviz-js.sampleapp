@@ -1,3 +1,11 @@
+var setFileContent = function(fileName){
+    var span = document.getElementById('file-name');
+    while( span.firstChild ) {
+        span.removeChild( span.firstChild );
+    }
+    span.appendChild( document.createTextNode(fileName) );
+}
+
 window.onload = function() {
         var fileInput = document.getElementById('file-input');
         //var fileDisplayArea = document.getElementById('fileDisplayArea');
@@ -6,23 +14,21 @@ window.onload = function() {
             var file = fileInput.files[0];
             var textType = /text.*/;
 
-            if (file.type.match(textType)) {
+            //if (file.type.match(textType)) {
                 var reader = new FileReader();
 
                 reader.onload = function(e) {
-                    //fileDisplayArea.innerText = reader.result;
-                    var x = 5;
                     (new SBGNContainer({
                         el: '#sbgn-network-container',
                         model : {cytoscapeJsGraph : 
                             sbgnmlToJson.convert(textToXmlObject(this.result))}
                     })).render();
                 }
-
-                reader.readAsText(file);    
-            } else {
+                reader.readAsText(file);
+                setFileContent(file.name);
+            //} else {
                 //fileDisplayArea.innerText = "File not supported!"
-            }
+            //}
         });
 };
 
@@ -71,6 +77,8 @@ $("#about").click(function(e){
 
 $("#load-sample1").click(function(e){
     var xmlObject = loadXMLDoc('samples/sample1.xml');
+    
+    setFileContent("sample1.xml");
 
     (new SBGNContainer({
         el: '#sbgn-network-container',
@@ -81,6 +89,8 @@ $("#load-sample1").click(function(e){
 $("#load-sample2").click(function(e){
     var xmlObject = loadXMLDoc('samples/sample2.xml');
 
+    setFileContent("sample2.xml");
+
     (new SBGNContainer({
         el: '#sbgn-network-container',
         model : {cytoscapeJsGraph : sbgnmlToJson.convert(xmlObject)}
@@ -89,6 +99,8 @@ $("#load-sample2").click(function(e){
 
 $("#load-sample3").click(function(e){
     var xmlObject = loadXMLDoc('samples/sample3.xml');
+    
+    setFileContent("sample3.xml");
 
     (new SBGNContainer({
         el: '#sbgn-network-container',
@@ -98,6 +110,8 @@ $("#load-sample3").click(function(e){
 
 $("#load-sample4").click(function(e){
     var xmlObject = loadXMLDoc('samples/sample4.xml');
+    
+    setFileContent("sample4.xml");
 
     (new SBGNContainer({
         el: '#sbgn-network-container',
@@ -107,6 +121,8 @@ $("#load-sample4").click(function(e){
 
 $("#load-sample5").click(function(e){
     var xmlObject = loadXMLDoc('samples/sample5.xml');
+    
+    setFileContent("sample5.xml");
 
     (new SBGNContainer({
         el: '#sbgn-network-container',
@@ -116,6 +132,8 @@ $("#load-sample5").click(function(e){
 
 $("#load-sample6").click(function(e){
     var xmlObject = loadXMLDoc('samples/sample6.xml');
+    
+    setFileContent("sample6.xml");
 
     (new SBGNContainer({
         el: '#sbgn-network-container',
@@ -165,9 +183,12 @@ $("#load-file").click(function(evt){
 });
 
 $("#save-as-sbgnml").click(function(evt){
-    //TODO : add sbgn converter here
-    toSbgnml.createSbgnml();
+    var sbgnmlText = jsonToSbgnml.createSbgnml();
+
+    var blob = new Blob([sbgnmlText], {
+        type: "text/plain;charset=utf-8;",
+    });
+    var filename = document.getElementById('file-name').innerHTML;
+    saveAs(blob, filename);
+
 });
-
-
-

@@ -73,6 +73,12 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             'source-arrow-color': '#1ABC9C',
             'target-arrow-color': '#1ABC9C'
         })
+        .selector("edge:active")
+        .css({
+            'background-opacity' : '0.7',
+            'overlay-color' : '#1ABC9C',
+            'overlay-padding' : '8'
+        })
         .selector(".ui-cytoscape-edgehandles-source")
         .css({
             'border-color': '#5CC2ED',

@@ -1,7 +1,9 @@
 var sbgnFiltering = {
 
-	notHighlightNode: {'border-opacity': 0.3, 'text-opacity' : 0.3},
-    notHighlightEdge: {'opacity':0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
+	notHighlightNode : {'border-opacity': 0.3, 'text-opacity' : 0.3},
+    notHighlightEdge : {'opacity':0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
+    processTypes : ['process', 'omitted process', 'uncertain process', 
+        'association', 'dissociation', 'phenotype'],
 
     hideSelected: function(){
         var allNodes = cy.nodes();
@@ -54,6 +56,7 @@ var sbgnFiltering = {
     },
 
     expandNodes: function(nodesToShow){
+        var self = this;
         //add children
         nodesToShow = nodesToShow.add(nodesToShow.nodes().descendants());
         //add parents
@@ -61,9 +64,19 @@ var sbgnFiltering = {
         //add complex children
         nodesToShow = nodesToShow.add(nodesToShow.nodes("node[sbgnclass='complex']").descendants());
 
-        var processes = nodesToShow.nodes("node[sbgnclass='process']");
-        var nonProcesses = nodesToShow.nodes("node[sbgnclass!='process']");
-        var neighborProcesses = nonProcesses.neighborhood("node[sbgnclass='process']");
+        // var processes = nodesToShow.nodes("node[sbgnclass='process']");
+        // var nonProcesses = nodesToShow.nodes("node[sbgnclass!='process']");
+        // var neighborProcesses = nonProcesses.neighborhood("node[sbgnclass='process']");
+
+        var processes = nodesToShow.filter(function(){
+            return $.inArray(this._private.data.sbgnclass, self.processTypes) >= 0;
+        });
+        var nonProcesses = nodesToShow.filter(function(){
+            return $.inArray(this._private.data.sbgnclass, self.processTypes) === -1;
+        });
+        var neighborProcesses = nonProcesses.neighborhood().filter(function(){
+            return $.inArray(this._private.data.sbgnclass, self.processTypes) >= 0;
+        });
 
         nodesToShow = nodesToShow.add(processes.neighborhood());
         nodesToShow = nodesToShow.add(neighborProcesses);

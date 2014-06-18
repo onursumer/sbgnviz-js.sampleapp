@@ -1,7 +1,7 @@
 var sbgnStyleSheet = cytoscape.stylesheet()
         .selector("node")
         .css({
-            'border-width' : 1,
+            'border-width' : 1.5,
             'border-color' : '#555',
             'background-color' : '#f6f6f6',
             'font-size' : 11,
@@ -32,24 +32,24 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("node:selected")
         .css({
-            'border-color' : '#1ABC9C',
+            'border-color' : '#90B6CB',
             'target-arrow-color' : '#000',
             'text-outline-color' : '#000'
         })
         .selector("node:active")
         .css({
             'background-opacity' : '0.7',
-            'overlay-color' : '#1ABC9C',
+            'overlay-color' : '#90B6CB',
             'overlay-padding' : '8'
         })
         .selector("edge")
         .css({
-            'line-color' : '#444',
+            'line-color' : '#555',
             'target-arrow-fill' : 'hollow',
             'source-arrow-fill' : 'hollow',
             'width': 1.5,
-            'target-arrow-color': '#444',
-            'source-arrow-color': '#444',
+            'target-arrow-color': '#555',
+            'source-arrow-color': '#555',
             'target-arrow-shape' : 'data(sbgnclass)'
         })
         .selector("edge[sbgnclass='inhibition']")
@@ -69,14 +69,14 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge:selected")
         .css({
-            'line-color' : '#1ABC9C',
-            'source-arrow-color': '#1ABC9C',
-            'target-arrow-color': '#1ABC9C'
+            'line-color' : '#90B6CB',
+            'source-arrow-color': '#90B6CB',
+            'target-arrow-color': '#90B6CB'
         })
         .selector("edge:active")
         .css({
             'background-opacity' : '0.7',
-            'overlay-color' : '#1ABC9C',
+            'overlay-color' : '#90B6CB',
             'overlay-padding' : '8'
         })
         .selector(".ui-cytoscape-edgehandles-source")

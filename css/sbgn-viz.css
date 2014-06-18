@@ -72,7 +72,7 @@ body {
 .navbar .nav li.dropdown.active > .dropdown-toggle,
 .navbar .nav li.dropdown.open.active > .dropdown-toggle {
     color: #555555;
-    background-color: #1ABC9C;
+    background-color: #90B6CB;
     text-shadow: none !important;
 }
 
@@ -81,7 +81,7 @@ body {
 .dropdown-submenu:hover > a {
     color: #ffffff;
     text-decoration: none;
-    background-color: #1ABC9C;
+    background-color: #90B6CB;
     background-image: none;
     background-repeat: repeat-x;
     filter: none;
@@ -91,7 +91,7 @@ body {
 .dropdown-menu .active > a:hover {
     color: #ffffff;
     text-decoration: none;
-    background-color: #1ABC9C;
+    background-color: #90B6CB;
     background-image: none;
     filter: none;
 }
@@ -112,17 +112,17 @@ body {
 }
 
 .ui-widget-header {
-    background: #1ABC9C;
-    border: 1px solid #1ABC9C !important;
+    background: #90B6CB;
+    border: 1px solid #90B6CB !important;
 }
 
 .ui-dialog {
     z-index : 2000 !important;
-    border: 2px solid #1ABC9C !important;
+    border: 2px solid #90B6CB !important;
 }
 
 .ui-widget-header .ui-icon {
-    background-image: url(images/ui-icons_1ABC9C_256x240.png);
+    background-image: url(images/ui-icons_90B6CB_256x240.png);
 }
 
 #fancybox-wrap {
@@ -147,7 +147,7 @@ body {
 .sbgn-label{
     float:right;
     text-align: right;
-    color: #1ABC9C !important;
+    color: #90B6CB !important;
 }
 
 .input-file{
@@ -163,12 +163,12 @@ body {
 }
 
 .sbgn-frame {
-    border: 2px solid #1ABC9C;
+    border: 2px solid #90B6CB;
     padding-bottom : 10px;
 }
 
 .sbgn-text {
-    color :#1ABC9C;
+    color :#90B6CB;
     text-align: center;
     font-weight:bold;
 }

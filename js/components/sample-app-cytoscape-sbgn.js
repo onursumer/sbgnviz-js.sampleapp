@@ -14,33 +14,31 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             'padding-bottom' : '20',
             'padding-top' : '20'
         })
-        .selector("[sbgnclass='compartment']")
+        .selector("node[sbgnclass='compartment']")
         .css({
             'background-opacity' : '0',
-            'background-color' : '#FFFFFF'
+            'background-color' : '#FFFFFF',
+            'content' : 'data(sbgnlabel)',
+            'text-valign' : 'bottom',
+            'text-halign' : 'center',
+            'font-size' : '20'
         })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
         .css({
             'width' : 'data(sbgnbbox.w)',
             'height' : 'data(sbgnbbox.h)'
         })
-        .selector("node[sbgnclass='compartment']")
-        .css({
-            'content' : 'data(sbgnlabel)',
-            'text-valign' : 'bottom',
-            'text-halign' : 'center'
-        })
         .selector("node:selected")
         .css({
-            'border-color' : '#FC9505',
+            'border-color' : '#D0A134',
             'target-arrow-color' : '#000',
             'text-outline-color' : '#000'
         })
         .selector("node:active")
         .css({
             'background-opacity' : '0.7',
-            'overlay-color' : '#FC9505',
-            'overlay-padding' : '8'
+            'overlay-color' : '#D0A134',
+            'overlay-padding' : '14'
         })
         .selector("edge")
         .css({
@@ -69,14 +67,14 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge:selected")
         .css({
-            'line-color' : '#FC9505',
-            'source-arrow-color': '#FC9505',
-            'target-arrow-color': '#FC9505'
+            'line-color' : '#D0A134',
+            'source-arrow-color': '#D0A134',
+            'target-arrow-color': '#D0A134'
         })
         .selector("edge:active")
         .css({
             'background-opacity' : '0.7',
-            'overlay-color' : '#FC9505',
+            'overlay-color' : '#D0A134',
             'overlay-padding' : '8'
         })
         .selector(".ui-cytoscape-edgehandles-source")

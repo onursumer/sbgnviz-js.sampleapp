@@ -507,9 +507,8 @@
 
 		var style = edge._private.style;
 
-		var srcPos = edge.source().position();
-
-		var isConnectedToPort = false;
+		// var srcPos = edge.source().position();
+		var srcPos = addPortReplacementIfAny(edge.source()[0], edge._private.data.portSource);
 
 		dispX = startX - srcPos.x;
 		dispY = startY - srcPos.y;
@@ -541,9 +540,8 @@
 		var endX = edge._private.rscratch.arrowEndX;
 		var endY = edge._private.rscratch.arrowEndY;
 
-		var tgtPos = edge.target().position();
-
-		var isTargetConnectedToPort = false;
+		// var tgtPos = edge.target().position();
+		var tgtPos = addPortReplacementIfAny(edge.target()[0], edge._private.data.portTarget);
 
 		dispX = endX - tgtPos.x;
 		dispY = endY - tgtPos.y;
@@ -567,6 +565,20 @@
 			this.drawArrowShape(context, style['target-arrow-fill'].value, style['target-arrow-shape'].value,
 			endX, endY, dispX, dispY);
 		}
+	};
+
+	function addPortReplacementIfAny(node, edgePort){
+		var posX = node.position().x; 
+		var posY = node.position().y;
+		for(var i = 0 ; i < node._private.data.ports.length; i++){
+			var port = node._private.data.ports[i];
+			if(port.id == edgePort){
+				posX = posX + port.x;
+				posY = posY + port.y;
+				break;
+			}
+		}
+		return {'x' : posX, 'y' : posY};
 	};
 
 
@@ -623,20 +635,10 @@
 			rs.arrowStartY = arrowStart[1];
 			
 		} else if (rs.edgeType == "straight") {
+			var sourcePos = addPortReplacementIfAny(source, edge._private.data.portSource);
 
-			var sourceX = source.position().x; 
-			var sourceY = source.position().y;
-			for(var i = 0 ; i < source._private.data.ports.length; i++){
-				var port = source._private.data.ports[i];
-				if(port.id == edge._private.data.portSource){
-					sourceX = sourceX + port.x;
-					sourceY = sourceY + port.y;
-					break;
-				}
-			}
-
-			intersect = intersectLineSelection(this, target, sourceX, 
-				sourceY, edge._private.data.portTarget);
+			intersect = intersectLineSelection(this, target, sourcePos.x, 
+				sourcePos.y, edge._private.data.portTarget);
 				
 			if (intersect.length == 0) {
 				rs.noArrowPlacement = true;
@@ -646,10 +648,10 @@
 			}
 			
 			var arrowEnd = $$.math.shortenIntersection(intersect,
-				[sourceX, sourceY],
+				[sourcePos.x, sourcePos.y],
 				CanvasRenderer.arrowShapes[tgtArShape].spacing(edge));
 			var edgeEnd = $$.math.shortenIntersection(intersect,
-				[sourceX, sourceY],
+				[sourcePos.x, sourcePos.y],
 				CanvasRenderer.arrowShapes[tgtArShape].gap(edge));
 
 			rs.endX = edgeEnd[0];
@@ -658,20 +660,10 @@
 			rs.arrowEndX = arrowEnd[0];
 			rs.arrowEndY = arrowEnd[1];
 
-			var targetX = target.position().x; 
-			var targetY = target.position().y;
-			for(var i = 0 ; i < target._private.data.ports.length; i++){
-				var port = target._private.data.ports[i];
-				if(port.id == edge._private.data.portTarget){
-					targetX = targetX + port.x;
-					targetY = targetY + port.y;
-					break;
-				}
-			}
+			var targetPos = addPortReplacementIfAny(target, edge._private.data.portTarget);
 
-			intersect = intersectLineSelection(this, source, targetX, 
-				targetY, edge._private.data.portSource);
-
+			intersect = intersectLineSelection(this, source, targetPos.x, 
+				targetPos.y, edge._private.data.portSource);
 
 			if (intersect.length == 0) {
 				rs.noArrowPlacement = true;
@@ -681,10 +673,10 @@
 			}
 			
 			var arrowStart = $$.math.shortenIntersection(intersect,
-				[targetX, targetY],
+				[targetPos.x, targetPos.y],
 				CanvasRenderer.arrowShapes[srcArShape].spacing(edge));
 			var edgeStart = $$.math.shortenIntersection(intersect,
-				[targetX, targetY],
+				[targetPos.x, targetPos.y],
 				CanvasRenderer.arrowShapes[srcArShape].gap(edge));
 
 			rs.startX = edgeStart[0];
@@ -695,6 +687,7 @@
 						
 		} else if (rs.edgeType == "bezier") {
 			// if( window.badArrow) debugger;
+
 			var cp = [rs.cp2x, rs.cp2y];
 
 			intersect = intersectLineSelection(this, target, cp[0], cp[1],
@@ -714,14 +707,10 @@
 			intersect = intersectLineSelection(this, source, cp[0], cp[1],
 				edge._private.data.portSource);
 			
-			var arrowStart = $$.math.shortenIntersection(
-				intersect, 
-				cp,
+			var arrowStart = $$.math.shortenIntersection(intersect, cp,
 				CanvasRenderer.arrowShapes[srcArShape].spacing(edge)
 			);
-			var edgeStart = $$.math.shortenIntersection(
-				intersect, 
-				cp,
+			var edgeStart = $$.math.shortenIntersection(intersect, cp,
 				CanvasRenderer.arrowShapes[srcArShape].gap(edge)
 			);
 		
@@ -910,8 +899,12 @@
 			src = cy.getElementById( hashTable[pairId][0]._private.data.source );
 			tgt = cy.getElementById( hashTable[pairId][0]._private.data.target );
 
-			srcPos = src._private.position;
-			tgtPos = tgt._private.position;
+			var tEdge = hashTable[pairId][0];
+			tgtPos = addPortReplacementIfAny(tgt, tEdge._private.data.portTarget);
+			srcPos = addPortReplacementIfAny(src, tEdge._private.data.portSource);
+
+			// srcPos = src._private.position;
+			// tgtPos = tgt._private.position;
 
 			srcW = this.getNodeWidth(src);
 			srcH = this.getNodeHeight(src);
@@ -942,7 +935,7 @@
 					srcBorder / 2
 				);
 				*/
-				var srcOutside = intersectLineSelection(this, src, tgtPos.x, tgtPos.y, pairId.portSource);
+				var srcOutside = intersectLineSelection(this, src, tgtPos.x, tgtPos.y, tEdge._private.data.portSource);
 
 				// pt outside tgt shape to calc distance/displacement from src to tgt
 				/*
@@ -956,7 +949,7 @@
 					tgtBorder / 2
 				);
 				*/
-				var tgtOutside = intersectLineSelection(this, tgt, srcPos.x, srcPos.y, pairId.portTarget);
+				var tgtOutside = intersectLineSelection(this, tgt, srcPos.x, srcPos.y, tEdge._private.data.portTarget);
 
 				var midpt = {
 					x: ( srcOutside[0] + tgtOutside[0] )/2,
@@ -1695,6 +1688,12 @@
 		};
 	}
 
+	$$.sbgn.colors = {
+		clone : "#787878", 
+		association : "#6B6B6B",
+		port : "#6B6B6B"
+	};
+
 	function truncateText(textProp, context) {
 	    var width;
 	    var text = (typeof textProp.label === 'undefined') ? "" : textProp.label;
@@ -1708,6 +1707,7 @@
 	};
 
 	$$.sbgn.drawText = function(context, textProp){
+		var oldFont = context.font;
 		context.font = textProp.font;
 		context.textAlign = "center";
 		context.textBaseline = "middle";
@@ -1717,6 +1717,7 @@
 		//context.globalAlpha = textProp.opacity;
 		context.fillText("" + truncateText(textProp, context), textProp.centerX, textProp.centerY);
 		context.fillStyle = oldStyle;
+		context.font = oldFont;
 		//context.globalAlpha = oldOpacity;
 		//context.stroke();
 	};
@@ -1727,22 +1728,32 @@
 		$$.sbgn.drawText(context, textProp);
 	};
 
+	$$.sbgn.drawDynamicLabelText = function(context, textProp){
+		var textHeight = parseInt(textProp.height/3);
+		textProp.color = "#0f0f0f";
+		textProp.font = textHeight + "px Arial";
+		$$.sbgn.drawText(context, textProp);
+	};
+
 	$$.sbgn.drawStateText = function(context, textProp){
 		var stateValue = textProp.state.value;
 		var stateVariable = textProp.state.variable;
 
 		var stateLabel = (stateVariable == null /*|| typeof stateVariable === undefined */) ? stateValue : 
 			stateValue + "@" + stateVariable;
+		
+		var fontSize = parseInt(textProp.height/2);
 
+		textProp.font = fontSize + "px Arial";
 		textProp.label = stateLabel;
 		textProp.color = "#0f0f0f";
-		textProp.font = "8px Arial";
 		$$.sbgn.drawText(context, textProp);
 	};
 
 	$$.sbgn.drawInfoText = function(context, textProp){
+		var fontSize = parseInt(textProp.height/2);
+		textProp.font = fontSize + "px Arial";
 		textProp.color = "#0f0f0f";
-		textProp.font = "8px Arial";
 		$$.sbgn.drawText(context, textProp);
 	};
 
@@ -1801,7 +1812,8 @@
 			var stateCenterY = state.bbox.y + centerY;
 
 			var textProp = {'centerX':stateCenterX, 'centerY':stateCenterY,
-				'opacity':node._private.style['text-opacity'].value, 'width': stateWidth};
+				'opacity':node._private.style['text-opacity'].value, 
+				'width': stateWidth, 'height': stateHeight};
 
 			if(state.clazz == "state variable" && stateCount < 2){//draw ellipse
 				//var stateLabel = state.state.value;
@@ -1861,7 +1873,8 @@
 					stateCenterY = centerY - beginPosY;
 
 					var textProp = {'centerX':stateCenterX, 'centerY':stateCenterY,
-						'opacity':node._private.style['text-opacity'].value, 'width': stateWidth};
+						'opacity':node._private.style['text-opacity'].value, 
+						'width': stateWidth, 'height': stateHeight};
 
 					if(state.clazz == "state variable"){//draw ellipse
 						$$.sbgn.drawEllipse(context,
@@ -1889,7 +1902,8 @@
 					stateCenterY = centerY + beginPosY;
 
 					var textProp = {'centerX':stateCenterX, 'centerY':stateCenterY,
-						'opacity':node._private.style['text-opacity'].value, 'width': stateWidth};
+						'opacity':node._private.style['text-opacity'].value, 
+						'width': stateWidth, 'height': stateHeight};
 
 					if(state.clazz == "state variable"){//draw ellipse
 						$$.sbgn.drawEllipse(context,
@@ -1971,7 +1985,7 @@
 			width, height, cloneMarker){
 			if(cloneMarker != null){
 				var oldStyle  = context.fillStyle;
-				context.fillStyle = "#0f0f0f";
+				context.fillStyle = $$.sbgn.colors.clone;
 
 				context.beginPath();
 				context.translate(centerX, centerY);
@@ -2018,7 +2032,7 @@
 					2 * cornerRadius, 2 * cornerRadius, cloneMarker);
 
 				var oldStyle  = context.fillStyle;
-				context.fillStyle = "#0f0f0f";
+				context.fillStyle = $$.sbgn.colors.clone;
 
 				var recPoints = $$.math.generateUnitNgonPointsFitToSquare(4, 0);
 				var cloneX = centerX;
@@ -2042,7 +2056,7 @@
 				var markerPoints = [-5/6, -1, 5/6, -1, 1, 1, -1, 1];
 
 				var oldStyle  = context.fillStyle;
-				context.fillStyle = "#0f0f0f";
+				context.fillStyle = $$.sbgn.colors.clone;
 
 				renderer.drawPolygon(context,
 					cloneX, cloneY,
@@ -2063,7 +2077,7 @@
 				var cloneX = centerX;
 				var cloneY = centerY + 3 * height / 8;
 				var oldStyle  = context.fillStyle;
-				context.fillStyle = "#0f0f0f";
+				context.fillStyle = $$.sbgn.colors.clone;
 
 				var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
 
@@ -2094,7 +2108,7 @@
 				var markerPoints = [-1, -1, 1, -1, 1-cpX, 1, -1+cpX, 1];
 
 				var oldStyle  = context.fillStyle;
-				context.fillStyle = "#0f0f0f";
+				context.fillStyle = $$.sbgn.colors.clone;
 
 				renderer.drawPolygon(context,
 					cloneX, cloneY,
@@ -2684,7 +2698,7 @@
 	    return []; // if nothing
 	};
 
-	$$.sbgn.addPortsToEllipseShape = function(context, node){
+	$$.sbgn.drawPortsToEllipseShape = function(context, node){
 		var width = node.width();
 		var height = node.height();
 		var centerX = node._private.position.x;
@@ -2703,14 +2717,14 @@
 
 			//add a little black circle to ports
 			var oldStyle = context.fillStyle;
-			context.fillStyle = "#000000";
+			context.fillStyle = $$.sbgn.colors.port;
 			$$.sbgn.drawEllipse(context, portX, portY, 5, 5);
 			context.fillStyle = oldStyle;
 			context.stroke();
 		}
 	};
 
-	$$.sbgn.addPortsToPolygonShape = function(context, node, points){
+	$$.sbgn.drawPortsToPolygonShape = function(context, node, points){
 		var width = node.width();
 		var height = node.height();
 		var centerX = node._private.position.x;
@@ -2732,7 +2746,7 @@
 
 			//add a little black circle to ports
 			var oldStyle = context.fillStyle;
-			context.fillStyle = "#000000";
+			context.fillStyle = $$.sbgn.colors.port;
 			$$.sbgn.drawEllipse(context, portX, portY, 5, 5);
 			context.fillStyle = oldStyle;
 			context.stroke();
@@ -3018,9 +3032,9 @@
 
 			$$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
 
-			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
-				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, nodeProp);			
+			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY,
+				'opacity':node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
+			$$.sbgn.drawDynamicLabelText(context, nodeProp);			
 		},
 		
 		drawPath: function(context, node) {
@@ -3182,9 +3196,9 @@
 			$$.sbgn.cloneMarker.nucleicAcidFeature(context, centerX, centerY, 
 				width, height, cloneMarker, false);
 
-			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
-				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, nodeProp);
+			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY,
+				'opacity':node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
+			$$.sbgn.drawDynamicLabelText(context, nodeProp);
 
 			$$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
 		},
@@ -3329,9 +3343,9 @@
 			$$.sbgn.cloneMarker.perturbingAgent(context, centerX, centerY, 
 				width, height, cloneMarker);
 
-			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
-				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, nodeProp);
+			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY,
+				'opacity':node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
+			$$.sbgn.drawDynamicLabelText(context, nodeProp);
 			
 			$$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
 		},
@@ -3460,9 +3474,9 @@
 			$$.sbgn.cloneMarker.simpleChemical(context, centerX, centerY, 
 				width - padding, height - padding, cloneMarker, false);
 
-			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
-				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, nodeProp);
+			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY,
+				'opacity':node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
+			$$.sbgn.drawDynamicLabelText(context, nodeProp);
 			
 			$$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
 		},
@@ -3692,8 +3706,8 @@
 			context.stroke();
 
 			var nodeProp = {'label':label, 'centerX':centerX - width/6, 'centerY':centerY,
-				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, nodeProp);
+				'opacity':node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
+			$$.sbgn.drawDynamicLabelText(context, nodeProp);
 		},
 
 		drawPath: function(context, node) {
@@ -3781,9 +3795,9 @@
 			$$.sbgn.cloneMarker.unspecifiedEntity(context, centerX, centerY, 
 					width, height, cloneMarker);
 
-			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY-2,
-				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, nodeProp);
+			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY,
+				'opacity':node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
+			$$.sbgn.drawDynamicLabelText(context, nodeProp);
 			
 			$$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
 
@@ -3882,10 +3896,10 @@
 			context.stroke();
 
 			var textProp = {'label':this.label, 'centerX':centerX , 'centerY':centerY,
-				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, textProp);
+				'opacity':node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
+			$$.sbgn.drawDynamicLabelText(context, textProp);
 
-			$$.sbgn.addPortsToEllipseShape(context, node);
+			$$.sbgn.drawPortsToEllipseShape(context, node);
 		},
 
 		drawPath: function(context, node) {
@@ -3954,8 +3968,8 @@
 			context.stroke();
 
 			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY,
-				'opacity':node._private.style['text-opacity'].value, 'width': node._private.data.sbgnbbox.w};
-			$$.sbgn.drawLabelText(context, nodeProp);
+				'opacity':node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
+			$$.sbgn.drawDynamicLabelText(context, nodeProp);
 		},
 
 		drawPath: function(context, node) {
@@ -4049,7 +4063,7 @@
 
 			context.fill();
 
-			$$.sbgn.addPortsToEllipseShape(context, node);
+			$$.sbgn.drawPortsToEllipseShape(context, node);
 
 		},
 
@@ -4119,13 +4133,13 @@
 			var padding = node._private.style["border-width"].pxValue;
 
 			var oldStyle = context.fillStyle;
-			context.fillStyle = '#000000';
+			context.fillStyle = $$.sbgn.colors.association;
 			nodeShapes['ellipse'].draw(context, centerX, centerY, width, height);
 			context.fillStyle = oldStyle;
 	    	nodeShapes['ellipse'].drawPath(context, centerX, centerY, width, height);
 			context.stroke();
 
-			$$.sbgn.addPortsToEllipseShape(context, node);
+			$$.sbgn.drawPortsToEllipseShape(context, node);
 	    },
 	    
 	    drawPath: function(context, node) {
@@ -4204,10 +4218,10 @@
 			context.stroke();
 
 			var textProp = {'label':this.label, 'centerX':centerX, 'centerY':centerY,
-				'opacity':node._private.style['text-opacity'].value, 'width': width};
+				'opacity':node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
 			$$.sbgn.drawLabelText(context, textProp);
 
-			$$.sbgn.addPortsToPolygonShape(context, node, this.points);
+			$$.sbgn.drawPortsToPolygonShape(context, node, this.points);
 		},
 
 		drawPath: function(context, node) {

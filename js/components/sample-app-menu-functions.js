@@ -68,7 +68,7 @@ $("#about").click(function(e){
     _.template($("#about-template").html(), {}),
     {
         'autoDimensions' : false,
-        'width' : 380,
+        'width' : 300,
         'height' : 320,
         'transitionIn' : 'none',
         'transitionOut' : 'none',

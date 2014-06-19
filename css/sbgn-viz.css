@@ -167,6 +167,10 @@ body {
     padding-bottom : 10px;
 }
 
+.marg {
+    margin-bottom : -6px;
+}
+
 .sbgn-text {
     color :#90B6CB;
     text-align: center;

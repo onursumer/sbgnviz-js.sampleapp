@@ -69,7 +69,7 @@ $("#about").click(function(e){
     {
         'autoDimensions' : false,
         'width' : 380,
-        'height' : 368,
+        'height' : 320,
         'transitionIn' : 'none',
         'transitionOut' : 'none',
     });

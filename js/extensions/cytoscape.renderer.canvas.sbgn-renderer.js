@@ -1699,7 +1699,7 @@
 	    var text = (typeof textProp.label === 'undefined') ? "" : textProp.label;
 	    var len = text.length;
 	    var ellipsis = "...";
-	    while ((width = context.measureText(text).width) > textProp.width) {
+	    while ((width = context.measureText(text).width) > textProp.width - 10) {
 	        --len;
 	        text = text.substring(0, len) + ellipsis;
 	    }
@@ -3950,8 +3950,8 @@
 	};
 
 	nodeShapes["phenotype"] = {
-		points: [-1, 0, -0.5, -1, 0.5, -1, 
-			1, 0, 0.5, 1, -0.5, 1],
+		points: [-1, 0, -0.7, -1, 0.7, -1, 
+			1, 0, 0.7, 1, -0.7, 1],
 
 		draw: function(context, node) {
 			var width = node.width();

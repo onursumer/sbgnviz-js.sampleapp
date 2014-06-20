@@ -30,14 +30,14 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("node:selected")
         .css({
-            'border-color' : '#D0A134',
+            'border-color' : '#d67614',
             'target-arrow-color' : '#000',
             'text-outline-color' : '#000'
         })
         .selector("node:active")
         .css({
             'background-opacity' : '0.7',
-            'overlay-color' : '#D0A134',
+            'overlay-color' : '#d67614',
             'overlay-padding' : '14'
         })
         .selector("edge")
@@ -67,14 +67,14 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         })
         .selector("edge:selected")
         .css({
-            'line-color' : '#D0A134',
-            'source-arrow-color': '#D0A134',
-            'target-arrow-color': '#D0A134'
+            'line-color' : '#d67614',
+            'source-arrow-color': '#d67614',
+            'target-arrow-color': '#d67614'
         })
         .selector("edge:active")
         .css({
             'background-opacity' : '0.7',
-            'overlay-color' : '#D0A134',
+            'overlay-color' : '#d67614',
             'overlay-padding' : '8'
         })
         .selector(".ui-cytoscape-edgehandles-source")

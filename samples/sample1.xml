@@ -112,6 +112,11 @@
             <start y="560.0" x="430.0"/>
             <end y="620.0" x="430.0"/>
         </arc>
+
+        <arc target="glyph4.1" source="glyph6" class="necessary stimulation">
+            <start y="560.0" x="430.0"/>
+            <end y="620.0" x="430.0"/>
+        </arc>
         <arc target="glyph5" source="glyph3" class="necessary stimulation">
             <start y="660.0" x="560.0"/>
             <end y="740.0" x="560.0"/>

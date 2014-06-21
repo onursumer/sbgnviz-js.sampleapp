@@ -496,6 +496,20 @@
 		if (near.length > 0) { return near[ near.length - 1 ]; } else { return null; }
 	};
 
+	function addPortReplacementIfAny(node, edgePort){
+		var posX = node.position().x; 
+		var posY = node.position().y;
+		for(var i = 0 ; i < node._private.data.ports.length; i++){
+			var port = node._private.data.ports[i];
+			if(port.id == edgePort){
+				posX = posX + port.x;
+				posY = posY + port.y;
+				break;
+			}
+		}
+		return {'x' : posX, 'y' : posY};
+	};
+
 	CanvasRenderer.prototype.drawArrowheads = function(context, edge, drawOverlayInstead) {
 		if( drawOverlayInstead ){ return; } // don't do anything for overlays 
 
@@ -565,20 +579,6 @@
 			this.drawArrowShape(context, style['target-arrow-fill'].value, style['target-arrow-shape'].value,
 			endX, endY, dispX, dispY);
 		}
-	};
-
-	function addPortReplacementIfAny(node, edgePort){
-		var posX = node.position().x; 
-		var posY = node.position().y;
-		for(var i = 0 ; i < node._private.data.ports.length; i++){
-			var port = node._private.data.ports[i];
-			if(port.id == edgePort){
-				posX = posX + port.x;
-				posY = posY + port.y;
-				break;
-			}
-		}
-		return {'x' : posX, 'y' : posY};
 	};
 
 
@@ -899,9 +899,10 @@
 			src = cy.getElementById( hashTable[pairId][0]._private.data.source );
 			tgt = cy.getElementById( hashTable[pairId][0]._private.data.target );
 
-			var tEdge = hashTable[pairId][0];
-			tgtPos = addPortReplacementIfAny(tgt, tEdge._private.data.portTarget);
-			srcPos = addPortReplacementIfAny(src, tEdge._private.data.portSource);
+			// var tEdge = hashTable[pairId][0];
+
+			// tgtPos = addPortReplacementIfAny(tgt, tEdge._private.data.portTarget);
+			// srcPos = addPortReplacementIfAny(src, tEdge._private.data.portSource);
 
 			// srcPos = src._private.position;
 			// tgtPos = tgt._private.position;
@@ -920,35 +921,13 @@
 
 			badBezier = false;
 			
-
+/*
 			if (hashTable[pairId].length > 1) {
 
 				// pt outside src shape to calc distance/displacement from src to tgt
-				/*
-				var srcOutside = srcShape.intersectLine(
-					srcPos.x,
-					srcPos.y,
-					srcW,
-					srcH,
-					tgtPos.x,
-					tgtPos.y,
-					srcBorder / 2
-				);
-				*/
 				var srcOutside = intersectLineSelection(this, src, tgtPos.x, tgtPos.y, tEdge._private.data.portSource);
 
 				// pt outside tgt shape to calc distance/displacement from src to tgt
-				/*
-				var tgtOutside = tgtShape.intersectLine(
-					tgtPos.x,
-					tgtPos.y,
-					tgtW,
-					tgtH,
-					srcPos.x,
-					srcPos.y,
-					tgtBorder / 2
-				);
-				*/
 				var tgtOutside = intersectLineSelection(this, tgt, srcPos.x, srcPos.y, tEdge._private.data.portTarget);
 
 				var midpt = {
@@ -977,21 +956,63 @@
 				// if src intersection is inside tgt or tgt intersection is inside src, then no ctrl pts to draw
 				if( checkPointSelection(this, tgt, srcOutside[0], srcOutside[1], tgtBorder/2) ||
 					checkPointSelection(this, src, tgtOutside[0], tgtOutside[1], srcBorder/2)
-					/* tgtShape.checkPoint( srcOutside[0], srcOutside[1], tgtBorder/2, tgtW, tgtH, tgtPos.x, tgtPos.y )  ||
-					srcShape.checkPoint( tgtOutside[0], tgtOutside[1], srcBorder/2, srcW, srcH, srcPos.x, srcPos.y ) */ 
 				){
 					vectorNormInverse = {};
 					badBezier = true;
 				}
 				
 			}
-			
+*/			
 			var edge;
 			var rs;
 			
 			for (var i = 0; i < hashTable[pairId].length; i++) {
 				edge = hashTable[pairId][i];
 				rs = edge._private.rscratch;
+
+				tgtPos = addPortReplacementIfAny(edge.target()[0], edge._private.data.portTarget);
+				srcPos = addPortReplacementIfAny(edge.source()[0], edge._private.data.portSource);
+
+				// pt outside src shape to calc distance/displacement from src to tgt
+				var srcOutside = intersectLineSelection(this, src, tgtPos.x, tgtPos.y, edge._private.data.portSource);
+
+				// pt outside tgt shape to calc distance/displacement from src to tgt
+				var tgtOutside = intersectLineSelection(this, tgt, srcPos.x, srcPos.y, edge._private.data.portTarget);
+
+				var midpt = {
+					x: ( srcOutside[0] + tgtOutside[0] )/2,
+					y: ( srcOutside[1] + tgtOutside[1] )/2
+				};
+
+				var dy = ( tgtOutside[1] - srcOutside[1] );
+				var dx = ( tgtOutside[0] - srcOutside[0] );
+				var l = Math.sqrt( dx*dx + dy*dy );
+
+				var vector = {
+					x: dx,
+					y: dy
+				};
+				
+				var vectorNorm = {
+					x: vector.x/l,
+					y: vector.y/l
+				};
+				vectorNormInverse = {
+					x: -vectorNorm.y,
+					y: vectorNorm.x
+				};
+
+				// if src intersection is inside tgt or tgt intersection is inside src, then no ctrl pts to draw
+				if( checkPointSelection(this, tgt, srcOutside[0], srcOutside[1], tgtBorder/2) ||
+					checkPointSelection(this, src, tgtOutside[0], tgtOutside[1], srcBorder/2)
+				){
+					vectorNormInverse = {};
+					badBezier = true;
+				}
+
+
+
+
 				
 				var edgeIndex1 = rs.lastEdgeIndex;
 				var edgeIndex2 = i;

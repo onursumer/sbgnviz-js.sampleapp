@@ -2,6 +2,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/html">
   <head>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <title>SBGNViz.js</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -16,6 +17,7 @@
     <!-- Loading cytoscape.js plugins -->
     <link href="css/cytoscape.js-panzoom.css" rel="stylesheet" type="text/css" />
     <link href="css/font-awesome-4.0.3/css/font-awesome.css" rel="stylesheet" type="text/css" />
+    <link href="css/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
 
     <link href="css/sbgn-viz.css" rel="stylesheet">
 
@@ -77,13 +79,15 @@
 
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-               Filter 
+               Edit 
                <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
               <li><a href="#" id="hide-selected">Hide Selected</a></li>
               <li><a href="#" id="show-selected">Show Selected</a></li>
               <li><a href="#" id="show-all">Show All</a></li>
+              <li class="divider"></li>
+              <li><a href="#" id="delete-selected">Delete Selected</a></li>
             </ul>
           </li>
 
@@ -96,6 +100,7 @@
               <li><a href="#" id="neighbors-of-selected">Neighbors of Selected</a></li>
               <li><a href="#" id="processes-of-selected">Processes of Selected</a></li>
               <li><a href="#" id="remove-highlights">Remove Highlights</a></li>
+
             </ul>
           </li>
 
@@ -138,6 +143,12 @@
 
   <div id="sbgn-layout-table" title="Layout Properties">
     <!-- sbgn layout table will be shown here -->
+  </div>
+
+  <div id="biogene-container" style="display: none">
+  </div>
+
+  <div id="box">
   </div>
 
   <!-- templates -->
@@ -194,8 +205,9 @@
     </div>
   </script>
 
-  <script type="text/template" id="loading-template">
-      <img class="centered" src="images/loading.gif" height="381" width="508" align="middle">
+  <script type="text/template" id="loading-small-template">
+      <p class="sbgn-text"> <%= name %> </p>
+      <img class="centered" src="images/loading-small.gif" height="auto" width="auto" align="middle">
   </script>
 
   <script type="text/template" id="layout-settings-template">
@@ -274,14 +286,74 @@
       </table>
   </script>
 
+ <!-- BioGeneView template for backbone.js -->
+  <script type="text/template" id="biogene-template">
+      <div class='node-details-text'>
+          <table class="table table-condensed table-striped" cellspacing="10">
+              <tr class="biogene-info biogene-description node-details-summary">
+                  <th valign="top">Gene Summary:</th>
+                  <td colspan="2" class="expandable">
+                      <%=geneSummary %>
+                  </td>
+              </tr>
+              <tr class="biogene-info biogene-aliases">
+                  <th valign="top">Aliases:</th>
+                  <td>
+                      <%=geneAliases %>
+                  </td>
+              </tr>
+              <tr class="biogene-info biogene-description">
+                  <th>Description:</th>
+                  <td class="expandable">
+                      <%=geneDescription %>
+                  </td>
+              </tr>
+              <tr class="biogene-info biogene-location">
+                  <th valign="top">Chromosome Location:</th>
+                  <td>
+                      <%=geneLocation %>
+                  </td>
+              </tr>
+              <tr class="biogene-info biogene-uniprot-links">
+                  <th valign="top">UniProt ID:</th>
+                  <td>
+                      <a href='http://www.uniprot.org/uniprot/<%= geneUniprotId %>' target='blank'>
+                          <%=geneUniprotId %>
+                      </a>
+                      <span class='biogene-uniprot-links-extra'>
+                            <%= geneUniprotLinks %>
+                        </span>
+                  </td>
+              </tr>
+              <tr class="biogene-info biogene-id">
+                  <th valign="top">Gene ID:</th>
+                  <td>
+                      <a href='http://www.ncbi.nlm.nih.gov/gene?term=<%= geneId %>' target='blank'>
+                          <%=geneId %>
+                      </a>
+                  </td>
+              </tr>
+          </table>
+      </div>
+  </script>
+
+  <script type="text/template" id="uniprot-link-template">
+      <a href="http://www.uniprot.org/uniprot/<%= id %>" target="_blank">
+          <%=id %>
+      </a>
+  </script>
+
   <script src="js/libraries/jquery-1.8.2.min.js"></script>
-  <script src="js/libraries/bootstrap.min.js"></script>
   <script src="js/libraries/jquery-ui-1.10.3.custom.min.js"></script>
+  <script src="js/libraries/jquery.fancybox-1.3.4.pack.js"></script>
+  <script src="js/libraries/jquery.expander-min.js"></script>
+  <script src="js/libraries/jquery.qtip.min.js"></script>
+  <script src="js/libraries/bootstrap.min.js"></script>
   <script src="js/libraries/underscore.js"></script>
   <script src="js/libraries/backbone-min.js"></script>
-  <script src="js/libraries/jquery.fancybox-1.3.4.pack.js"></script>
   <script src="js/libraries/cytoscape.min.js"></script>
   <script src="js/libraries/cytoscape.js-panzoom.js"></script>
+  <script src="js/libraries/cytoscape.js-qtip.js"></script>
   <script src="js/libraries/FileSaver.js"></script>
 
   <script src="js/extensions/cytoscape.layout.tiled-cose.js"></script>
@@ -293,6 +365,7 @@
 
   <script src="js/components/sample-app-cytoscape-sbgn.js"></script>
   <script src="js/components/sample-app-menu-functions.js"></script>
+  <script src="js/components/biogene-info.js"></script>
 
   </body>
 </html>

@@ -5,6 +5,13 @@ var sbgnFiltering = {
     processTypes : ['process', 'omitted process', 'uncertain process', 
         'association', 'dissociation', 'phenotype'],
 
+    deleteSelected: function(){
+        var allNodes = cy.nodes();
+        var selectedNodes = cy.nodes(":selected");
+        var nodesToShow = this.expandRemainingNodes(selectedNodes, allNodes);
+        allNodes.not(nodesToShow).remove();
+    },
+
     hideSelected: function(){
         var allNodes = cy.nodes();
         var selectedNodes = cy.nodes(":selected");

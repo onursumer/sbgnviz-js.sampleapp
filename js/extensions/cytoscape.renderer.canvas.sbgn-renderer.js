@@ -603,7 +603,7 @@
 			
 			var cp = [rs.cp2cx, rs.cp2cy];
 
-			intersect = intersectLineSelection(this, target, cp[0], cp[1], 
+			intersect = intersectLineSelection(this, target, cp[0], cp[1],
 				edge._private.data.portTarget);
 			
 			var arrowEnd = $$.math.shortenIntersection(intersect, cp,
@@ -855,366 +855,352 @@
 		return shape;
 	};
 
-	// Find edge control points
-	CanvasRenderer.prototype.findEdgeControlPoints = function(edges) {
-		var hashTable = {}; var cy = this.data.cy;
-		var pairIds = [];
-		
-		// create a table of edge (src, tgt) => list of edges between them
-		var pairId;
-		for (var i = 0; i < edges.length; i++){
-			var edge = edges[i];
+ // Find edge control points
+  CanvasRenderer.prototype.findEdgeControlPoints = function(edges) {
+    var hashTable = {}; var cy = this.data.cy;
+    var pairIds = [];
+    var haystackEdges = [];
+    
+    // create a table of edge (src, tgt) => list of edges between them
+    var pairId;
+    for (var i = 0; i < edges.length; i++){
+      var edge = edges[i];
+      var style = edge._private.style;
 
-			// ignore edges who are not to be displayed
-			// they shouldn't take up space
-			if( edge._private.style.display.value === 'none' ){
-				continue;
-			}
+      // ignore edges who are not to be displayed
+      // they shouldn't take up space
+      if( style.display.value === 'none' ){
+        continue;
+      }
 
-			var srcId = edge._private.data.source;
-			var tgtId = edge._private.data.target;
+      if( style['curve-style'].value === 'haystack' ){
+        haystackEdges.push( edge );
+        continue;
+      }
 
-			pairId = srcId > tgtId ?
-				tgtId + '-' + srcId :
-				srcId + '-' + tgtId ;
+      var srcId = edge._private.data.source;
+      var tgtId = edge._private.data.target;
 
-			if (hashTable[pairId] == undefined) {
-				hashTable[pairId] = [];
-			}
-			
-			hashTable[pairId].push( edge );
-			pairIds.push( pairId );
-		}
+      pairId = srcId > tgtId ?
+        tgtId + '-' + srcId :
+        srcId + '-' + tgtId ;
 
-		var src, tgt, srcPos, tgtPos, srcW, srcH, tgtW, tgtH, srcShape, tgtShape, srcBorder, tgtBorder;
-		var midpt;
-		var vectorNormInverse;
-		var badBezier;
-		
-		// for each pair (src, tgt), create the ctrl pts
-		// Nested for loop is OK; total number of iterations for both loops = edgeCount	
-		for (var p = 0; p < pairIds.length; p++) {
-			pairId = pairIds[p];
-		
-			src = cy.getElementById( hashTable[pairId][0]._private.data.source );
-			tgt = cy.getElementById( hashTable[pairId][0]._private.data.target );
+      if (hashTable[pairId] == null) {
+        hashTable[pairId] = [];
+      }
+      
+      hashTable[pairId].push( edge );
+      pairIds.push( pairId );
+    }
 
-			// var tEdge = hashTable[pairId][0];
+    var src, tgt, srcPos, tgtPos, srcW, srcH, tgtW, tgtH, srcShape, tgtShape, srcBorder, tgtBorder;
+    var vectorNormInverse;
+    var badBezier;
+    
+    // for each pair (src, tgt), create the ctrl pts
+    // Nested for loop is OK; total number of iterations for both loops = edgeCount  
+    for (var p = 0; p < pairIds.length; p++) {
+      pairId = pairIds[p];
+    
+      src = cy.getElementById( hashTable[pairId][0]._private.data.source );
+      tgt = cy.getElementById( hashTable[pairId][0]._private.data.target );
 
-			// tgtPos = addPortReplacementIfAny(tgt, tEdge._private.data.portTarget);
-			// srcPos = addPortReplacementIfAny(src, tEdge._private.data.portSource);
+      srcPos = src._private.position;
+      tgtPos = tgt._private.position;
 
-			// srcPos = src._private.position;
-			// tgtPos = tgt._private.position;
+      srcW = this.getNodeWidth(src);
+      srcH = this.getNodeHeight(src);
 
-			srcW = this.getNodeWidth(src);
-			srcH = this.getNodeHeight(src);
+      tgtW = this.getNodeWidth(tgt);
+      tgtH = this.getNodeHeight(tgt);
 
-			tgtW = this.getNodeWidth(tgt);
-			tgtH = this.getNodeHeight(tgt);
+      srcShape = CanvasRenderer.nodeShapes[ this.getNodeShape(src) ];
+      tgtShape = CanvasRenderer.nodeShapes[ this.getNodeShape(tgt) ];
 
-			srcShape = CanvasRenderer.nodeShapes[ this.getNodeShape(src) ];
-			tgtShape = CanvasRenderer.nodeShapes[ this.getNodeShape(tgt) ];
+      srcBorder = src._private.style['border-width'].pxValue;
+      tgtBorder = tgt._private.style['border-width'].pxValue;
 
-			srcBorder = src._private.style["border-width"].pxValue;
-			tgtBorder = tgt._private.style["border-width"].pxValue;
+      badBezier = false;
+      
 
-			badBezier = false;
-			
-/*
-			if (hashTable[pairId].length > 1) {
+      if (hashTable[pairId].length > 1 && src !== tgt) {
 
-				// pt outside src shape to calc distance/displacement from src to tgt
-				var srcOutside = intersectLineSelection(this, src, tgtPos.x, tgtPos.y, tEdge._private.data.portSource);
+		// pt outside src shape to calc distance/displacement from src to tgt
+		var srcOutside = intersectLineSelection(this, src, tgtPos.x, tgtPos.y);
 
-				// pt outside tgt shape to calc distance/displacement from src to tgt
-				var tgtOutside = intersectLineSelection(this, tgt, srcPos.x, srcPos.y, tEdge._private.data.portTarget);
+		// pt outside tgt shape to calc distance/displacement from src to tgt
+		var tgtOutside = intersectLineSelection(this, tgt, srcPos.x, srcPos.y);
 
-				var midpt = {
-					x: ( srcOutside[0] + tgtOutside[0] )/2,
-					y: ( srcOutside[1] + tgtOutside[1] )/2
-				};
+        var midptSrcPts = {
+          x1: srcOutside[0],
+          x2: tgtOutside[0],
+          y1: srcOutside[1],
+          y2: tgtOutside[1]
+        };
 
-				var dy = ( tgtOutside[1] - srcOutside[1] );
-				var dx = ( tgtOutside[0] - srcOutside[0] );
-				var l = Math.sqrt( dx*dx + dy*dy );
+        var dy = ( tgtOutside[1] - srcOutside[1] );
+        var dx = ( tgtOutside[0] - srcOutside[0] );
+        var l = Math.sqrt( dx*dx + dy*dy );
 
-				var vector = {
-					x: dx,
-					y: dy
-				};
-				
-				var vectorNorm = {
-					x: vector.x/l,
-					y: vector.y/l
-				};
-				vectorNormInverse = {
-					x: -vectorNorm.y,
-					y: vectorNorm.x
-				};
+        var vector = {
+          x: dx,
+          y: dy
+        };
+        
+        var vectorNorm = {
+          x: vector.x/l,
+          y: vector.y/l
+        };
+        vectorNormInverse = {
+          x: -vectorNorm.y,
+          y: vectorNorm.x
+        };
 
-				// if src intersection is inside tgt or tgt intersection is inside src, then no ctrl pts to draw
-				if( checkPointSelection(this, tgt, srcOutside[0], srcOutside[1], tgtBorder/2) ||
-					checkPointSelection(this, src, tgtOutside[0], tgtOutside[1], srcBorder/2)
-				){
-					vectorNormInverse = {};
-					badBezier = true;
-				}
-				
-			}
-*/			
-			var edge;
-			var rs;
-			
-			for (var i = 0; i < hashTable[pairId].length; i++) {
-				edge = hashTable[pairId][i];
-				rs = edge._private.rscratch;
+		// if src intersection is inside tgt or tgt intersection is inside src, then no ctrl pts to draw
+		if( checkPointSelection(this, tgt, srcOutside[0], srcOutside[1], tgtBorder/2) ||
+			checkPointSelection(this, src, tgtOutside[0], tgtOutside[1], srcBorder/2)
+		){
+          vectorNormInverse = {};
+          badBezier = true;
+        }
+        
+      }
+      
+      var edge;
+      var rs;
+      
+      for (var i = 0; i < hashTable[pairId].length; i++) {
+        edge = hashTable[pairId][i];
+        rs = edge._private.rscratch;
 
-				tgtPos = addPortReplacementIfAny(edge.target()[0], edge._private.data.portTarget);
-				srcPos = addPortReplacementIfAny(edge.source()[0], edge._private.data.portSource);
+		var tgtPos2 = addPortReplacementIfAny(edge.target()[0], edge._private.data.portTarget);
+		var srcPos2 = addPortReplacementIfAny(edge.source()[0], edge._private.data.portSource);
 
-				// pt outside src shape to calc distance/displacement from src to tgt
-				var srcOutside = intersectLineSelection(this, src, tgtPos.x, tgtPos.y, edge._private.data.portSource);
+		// pt outside src shape to calc distance/displacement from src to tgt
+		var srcOutside = intersectLineSelection(this, src, tgtPos2.x, tgtPos2.y, edge._private.data.portSource);
 
-				// pt outside tgt shape to calc distance/displacement from src to tgt
-				var tgtOutside = intersectLineSelection(this, tgt, srcPos.x, srcPos.y, edge._private.data.portTarget);
+		// pt outside tgt shape to calc distance/displacement from src to tgt
+		var tgtOutside = intersectLineSelection(this, tgt, srcPos2.x, srcPos2.y, edge._private.data.portTarget);
+        
+        var edgeIndex1 = rs.lastEdgeIndex;
+        var edgeIndex2 = i;
 
-				var midpt = {
-					x: ( srcOutside[0] + tgtOutside[0] )/2,
-					y: ( srcOutside[1] + tgtOutside[1] )/2
-				};
+        var numEdges1 = rs.lastNumEdges;
+        var numEdges2 = hashTable[pairId].length;
 
-				var dy = ( tgtOutside[1] - srcOutside[1] );
-				var dx = ( tgtOutside[0] - srcOutside[0] );
-				var l = Math.sqrt( dx*dx + dy*dy );
+        var srcX1 = rs.lastSrcCtlPtX;
+        var srcX2 = srcPos2.x;
+        var srcY1 = rs.lastSrcCtlPtY;
+        var srcY2 = srcPos2.y;
+        var srcW1 = rs.lastSrcCtlPtW;
+        var srcW2 = src.outerWidth();
+        var srcH1 = rs.lastSrcCtlPtH;
+        var srcH2 = src.outerHeight();
 
-				var vector = {
-					x: dx,
-					y: dy
-				};
-				
-				var vectorNorm = {
-					x: vector.x/l,
-					y: vector.y/l
-				};
-				vectorNormInverse = {
-					x: -vectorNorm.y,
-					y: vectorNorm.x
-				};
+        var tgtX1 = rs.lastTgtCtlPtX;
+        var tgtX2 = tgtPos2.x;
+        var tgtY1 = rs.lastTgtCtlPtY;
+        var tgtY2 = tgtPos2.y;
+        var tgtW1 = rs.lastTgtCtlPtW;
+        var tgtW2 = tgt.outerWidth();
+        var tgtH1 = rs.lastTgtCtlPtH;
+        var tgtH2 = tgt.outerHeight();
 
-				// if src intersection is inside tgt or tgt intersection is inside src, then no ctrl pts to draw
-				if( checkPointSelection(this, tgt, srcOutside[0], srcOutside[1], tgtBorder/2) ||
-					checkPointSelection(this, src, tgtOutside[0], tgtOutside[1], srcBorder/2)
-				){
-					vectorNormInverse = {};
-					badBezier = true;
-				}
+        if( badBezier ){
+          rs.badBezier = true;
+        } else {
+          rs.badBezier = false;
+        }
+
+        if( srcX1 === srcX2 && srcY1 === srcY2 && srcW1 === srcW2 && srcH1 === srcH2
+        &&  tgtX1 === tgtX2 && tgtY1 === tgtY2 && tgtW1 === tgtW2 && tgtH1 === tgtH2
+        &&  edgeIndex1 === edgeIndex2 && numEdges1 === numEdges2 ){
+          // console.log('edge ctrl pt cache HIT')
+          continue; // then the control points haven't changed and we can skip calculating them
+        } else {
+          rs.lastSrcCtlPtX = srcX2;
+          rs.lastSrcCtlPtY = srcY2;
+          rs.lastSrcCtlPtW = srcW2;
+          rs.lastSrcCtlPtH = srcH2;
+          rs.lastTgtCtlPtX = tgtX2;
+          rs.lastTgtCtlPtY = tgtY2;
+          rs.lastTgtCtlPtW = tgtW2;
+          rs.lastTgtCtlPtH = tgtH2;
+          rs.lastEdgeIndex = edgeIndex2;
+          rs.lastNumEdges = numEdges2;
+          // console.log('edge ctrl pt cache MISS')
+        }
+
+        var eStyle = edge._private.style;
+        var stepSize = eStyle['control-point-step-size'].pxValue;
+        var stepDist = eStyle['control-point-distance'] !== undefined ? eStyle['control-point-distance'].pxValue : undefined;
+        var stepWeight = eStyle['control-point-weight'].value;
+
+        // Self-edge
+        if ( src.id() == tgt.id() ) {
+            
+          rs.edgeType = 'self';
+          
+          // New -- fix for large nodes
+          rs.cp2ax = srcPos2.x;
+          rs.cp2ay = srcPos2.y - (1 + Math.pow(srcH, 1.12) / 100) * stepSize * (i / 3 + 1);
+          
+          rs.cp2cx = srcPos2.x - (1 + Math.pow(srcW, 1.12) / 100) * stepSize * (i / 3 + 1);
+          rs.cp2cy = srcPos2.y;
+          
+          rs.selfEdgeMidX = (rs.cp2ax + rs.cp2cx) / 2.0;
+          rs.selfEdgeMidY = (rs.cp2ay + rs.cp2cy) / 2.0;
+          
+        // Straight edge
+        } else if (hashTable[pairId].length % 2 == 1
+          && i == Math.floor(hashTable[pairId].length / 2)) {
+          
+          rs.edgeType = 'straight';
+          
+        // Bezier edge
+        } else {
+          var normStepDist = (0.5 - hashTable[pairId].length / 2 + i) * stepSize;
+          var manStepDist = stepDist !== undefined ? $$.math.signum( normStepDist ) * stepDist : undefined;
+          var distanceFromMidpoint = manStepDist !== undefined ? manStepDist : normStepDist;
+          
+          var adjustedMidpt = {
+            x: midptSrcPts.x1 * (1 - stepWeight) + midptSrcPts.x2 * stepWeight,
+            y: midptSrcPts.y1 * (1 - stepWeight) + midptSrcPts.y2 * stepWeight
+          };
+
+          rs.edgeType = 'bezier';
+          
+          rs.cp2x = adjustedMidpt.x + vectorNormInverse.x * distanceFromMidpoint;
+          rs.cp2y = adjustedMidpt.y + vectorNormInverse.y * distanceFromMidpoint;
+          
+          // console.log(edge, midPointX, displacementX, distanceFromMidpoint);
+        }
+
+        // find endpts for edge
+        this.findEndpoints( edge );
+
+        var badStart = !$$.is.number( rs.startX ) || !$$.is.number( rs.startY );
+        var badAStart = !$$.is.number( rs.arrowStartX ) || !$$.is.number( rs.arrowStartY );
+        var badEnd = !$$.is.number( rs.endX ) || !$$.is.number( rs.endY );
+        var badAEnd = !$$.is.number( rs.arrowEndX ) || !$$.is.number( rs.arrowEndY );
+
+        var minCpADistFactor = 3;
+        var arrowW = this.getArrowWidth( edge._private.style['width'].pxValue ) * CanvasRenderer.arrowShapeHeight;
+        var minCpADist = minCpADistFactor * arrowW;
+        var startACpDist = $$.math.distance( { x: rs.cp2x, y: rs.cp2y }, { x: rs.startX, y: rs.startY } );
+        var closeStartACp = startACpDist < minCpADist;
+        var endACpDist = $$.math.distance( { x: rs.cp2x, y: rs.cp2y }, { x: rs.endX, y: rs.endY } );
+        var closeEndACp = endACpDist < minCpADist;
+
+        if( rs.edgeType === 'bezier' ){
+          var overlapping = false;
+
+          if( badStart || badAStart || closeStartACp ){
+            overlapping = true;
+
+            // project control point along line from src centre to outside the src shape
+            // (otherwise intersection will yield nothing)
+            var cpD = { // delta
+              x: rs.cp2x - srcPos2.x,
+              y: rs.cp2y - srcPos2.y
+            };
+            var cpL = Math.sqrt( cpD.x*cpD.x + cpD.y*cpD.y ); // length of line
+            var cpM = { // normalised delta
+              x: cpD.x / cpL,
+              y: cpD.y / cpL
+            };
+            var radius = Math.max(srcW, srcH);
+            var cpProj = { // *2 radius guarantees outside shape
+              x: rs.cp2x + cpM.x * 2 * radius,
+              y: rs.cp2y + cpM.y * 2 * radius
+            };
+
+			var srcCtrlPtIntn = intersectLineSelection(this, src, cpProj.x, cpProj.y, edge._private.data.portSource);
 
 
+            if( closeStartACp ){
+              rs.cp2x = rs.cp2x + cpM.x * (minCpADist - startACpDist); 
+              rs.cp2y = rs.cp2y + cpM.y * (minCpADist - startACpDist);
+            } else {
+              rs.cp2x = srcCtrlPtIntn[0] + cpM.x * minCpADist; 
+              rs.cp2y = srcCtrlPtIntn[1] + cpM.y * minCpADist;
+            }
+          }
+
+          if( badEnd || badAEnd || closeEndACp ){
+            overlapping = true;
+
+            // project control point along line from tgt centre to outside the tgt shape
+            // (otherwise intersection will yield nothing)
+            var cpD = { // delta
+              x: rs.cp2x - tgtPos2.x,
+              y: rs.cp2y - tgtPos2.y
+            };
+            var cpL = Math.sqrt( cpD.x*cpD.x + cpD.y*cpD.y ); // length of line
+            var cpM = { // normalised delta
+              x: cpD.x / cpL,
+              y: cpD.y / cpL
+            };
+            var radius = Math.max(srcW, srcH);
+            var cpProj = { // *2 radius guarantees outside shape
+              x: rs.cp2x + cpM.x * 2 * radius,
+              y: rs.cp2y + cpM.y * 2 * radius
+            };
+
+			var tgtCtrlPtIntn = intersectLineSelection(this, tgt, cpProj.x, cpProj.y, edge._private.data.portTarget);
 
 
-				
-				var edgeIndex1 = rs.lastEdgeIndex;
-				var edgeIndex2 = i;
+            if( closeEndACp ){
+              rs.cp2x = rs.cp2x + cpM.x * (minCpADist - endACpDist); 
+              rs.cp2y = rs.cp2y + cpM.y * (minCpADist - endACpDist);
+            } else {
+              rs.cp2x = tgtCtrlPtIntn[0] + cpM.x * minCpADist; 
+              rs.cp2y = tgtCtrlPtIntn[1] + cpM.y * minCpADist;
+            }
+            
+          }
 
-				var numEdges1 = rs.lastNumEdges;
-				var numEdges2 = hashTable[pairId].length;
+          if( overlapping ){
+            // recalc endpts
+            this.findEndpoints( edge );
+          }
+        }
 
-				var srcX1 = rs.lastSrcCtlPtX;
-				var srcX2 = srcPos.x;
-				var srcY1 = rs.lastSrcCtlPtY;
-				var srcY2 = srcPos.y;
-				var srcW1 = rs.lastSrcCtlPtW;
-				var srcW2 = src.outerWidth();
-				var srcH1 = rs.lastSrcCtlPtH;
-				var srcH2 = src.outerHeight();
+        // project the edge into rstyle
+        this.projectBezier( edge );
 
-				var tgtX1 = rs.lastTgtCtlPtX;
-				var tgtX2 = tgtPos.x;
-				var tgtY1 = rs.lastTgtCtlPtY;
-				var tgtY2 = tgtPos.y;
-				var tgtW1 = rs.lastTgtCtlPtW;
-				var tgtW2 = tgt.outerWidth();
-				var tgtH1 = rs.lastTgtCtlPtH;
-				var tgtH2 = tgt.outerHeight();
+      }
+    }
+      
+    for( var i = 0; i < haystackEdges.length; i++ ){
+      var edge = haystackEdges[i];
+      var rscratch = edge._private.rscratch;
+      var rFactor = 0.8;
 
-				if( badBezier ){
-					rs.badBezier = true;
-				} else {
-					rs.badBezier = false;
-				}
+      if( !rscratch.haystack ){
+        var srcR = rFactor * 0.5;
+        var angle = Math.random() * 2 * Math.PI;
 
-				if( srcX1 === srcX2 && srcY1 === srcY2 && srcW1 === srcW2 && srcH1 === srcH2
-				&&  tgtX1 === tgtX2 && tgtY1 === tgtY2 && tgtW1 === tgtW2 && tgtH1 === tgtH2
-				&&  edgeIndex1 === edgeIndex2 && numEdges1 === numEdges2 ){
-					// console.log('edge ctrl pt cache HIT')
-					continue; // then the control points haven't changed and we can skip calculating them
-				} else {
-					rs.lastSrcCtlPtX = srcX2;
-					rs.lastSrcCtlPtY = srcY2;
-					rs.lastSrcCtlPtW = srcW2;
-					rs.lastSrcCtlPtH = srcH2;
-					rs.lastTgtCtlPtX = tgtX2;
-					rs.lastTgtCtlPtY = tgtY2;
-					rs.lastTgtCtlPtW = tgtW2;
-					rs.lastTgtCtlPtH = tgtH2;
-					rs.lastEdgeIndex = edgeIndex2;
-					rs.lastNumEdges = numEdges2;
-					// console.log('edge ctrl pt cache MISS')
-				}
+        rscratch.source = {
+          x: srcR * Math.cos(angle),
+          y: srcR * Math.sin(angle)
+        };
 
-				var stepSize = edge._private.style["control-point-step-size"].value;
+        var tgtR = rFactor * 0.5;
+        var angle = Math.random() * 2 * Math.PI;
 
-				// Self-edge
-				if ( src.id() == tgt.id() ) {
-						
-					rs.edgeType = "self";
-					
-					// New -- fix for large nodes
-					rs.cp2ax = srcPos.x;
-					rs.cp2ay = srcPos.y - (1 + Math.pow(srcH, 1.12) / 100) * stepSize * (i / 3 + 1);
-					
-					rs.cp2cx = src._private.position.x - (1 + Math.pow(srcW, 1.12) / 100) * stepSize * (i / 3 + 1);
-					rs.cp2cy = srcPos.y;
-					
-					rs.selfEdgeMidX = (rs.cp2ax + rs.cp2cx) / 2.0;
-					rs.selfEdgeMidY = (rs.cp2ay + rs.cp2cy) / 2.0;
-					
-				// Straight edge
-				} else if (hashTable[pairId].length % 2 == 1
-					&& i == Math.floor(hashTable[pairId].length / 2)) {
-					
-					rs.edgeType = "straight";
-					
-				// Bezier edge
-				} else {
-					var distanceFromMidpoint = (0.5 - hashTable[pairId].length / 2 + i) * stepSize;
-					
-					rs.edgeType = "bezier";
-					
-					rs.cp2x = midpt.x + vectorNormInverse.x * distanceFromMidpoint;
-					rs.cp2y = midpt.y + vectorNormInverse.y * distanceFromMidpoint;
-					
-					// console.log(edge, midPointX, displacementX, distanceFromMidpoint);
-				}
+        rscratch.target = {
+          x: tgtR * Math.cos(angle),
+          y: tgtR * Math.sin(angle)
+        };
 
-				// find endpts for edge
-				this.findEndpoints( edge );
+        rscratch.edgeType = 'haystack';
+        rscratch.haystack = true;
+      }  
+    }
 
-				var badStart = !$$.is.number( rs.startX ) || !$$.is.number( rs.startY );
-				var badAStart = !$$.is.number( rs.arrowStartX ) || !$$.is.number( rs.arrowStartY );
-				var badEnd = !$$.is.number( rs.endX ) || !$$.is.number( rs.endY );
-				var badAEnd = !$$.is.number( rs.arrowEndX ) || !$$.is.number( rs.arrowEndY );
-
-				var minCpADistFactor = 3;
-				var arrowW = this.getArrowWidth( edge._private.style['width'].pxValue ) * CanvasRenderer.arrowShapeHeight;
-				var minCpADist = minCpADistFactor * arrowW;
-				var startACpDist = $$.math.distance( { x: rs.cp2x, y: rs.cp2y }, { x: rs.startX, y: rs.startY } );
-				var closeStartACp = startACpDist < minCpADist;
-				var endACpDist = $$.math.distance( { x: rs.cp2x, y: rs.cp2y }, { x: rs.endX, y: rs.endY } );
-				var closeEndACp = endACpDist < minCpADist;
-
-				if( rs.edgeType === "bezier" ){
-					var overlapping = false;
-
-					if( badStart || badAStart || closeStartACp ){
-						overlapping = true;
-
-						// project control point along line from src centre to outside the src shape
-						// (otherwise intersection will yield nothing)
-						var cpD = { // delta
-							x: rs.cp2x - srcPos.x,
-							y: rs.cp2y - srcPos.y
-						};
-						var cpL = Math.sqrt( cpD.x*cpD.x + cpD.y*cpD.y ); // length of line
-						var cpM = { // normalised delta
-							x: cpD.x / cpL,
-							y: cpD.y / cpL
-						};
-						var radius = Math.max(srcW, srcH);
-						var cpProj = { // *2 radius guarantees outside shape
-							x: rs.cp2x + cpM.x * 2 * radius,
-							y: rs.cp2y + cpM.y * 2 * radius
-						};
-						/*
-						var srcCtrlPtIntn = srcShape.intersectLine(
-							srcPos.x,
-							srcPos.y,
-							srcW,
-							srcH,
-							cpProj.x,
-							cpProj.y,
-							srcBorder / 2
-						);
-						*/
-
-						var srcCtrlPtIntn = intersectLineSelection(this, src, cpProj.x, cpProj.y, edge._private.data.portSource);
-
-						if( closeStartACp ){
-							rs.cp2x = rs.cp2x + cpM.x * (minCpADist - startACpDist); 
-							rs.cp2y = rs.cp2y + cpM.y * (minCpADist - startACpDist)
-						} else {
-							rs.cp2x = srcCtrlPtIntn[0] + cpM.x * minCpADist; 
-							rs.cp2y = srcCtrlPtIntn[1] + cpM.y * minCpADist;
-						}
-					}
-
-					if( badEnd || badAEnd || closeEndACp ){
-						overlapping = true;
-
-						// project control point along line from tgt centre to outside the tgt shape
-						// (otherwise intersection will yield nothing)
-						var cpD = { // delta
-							x: rs.cp2x - tgtPos.x,
-							y: rs.cp2y - tgtPos.y
-						};
-						var cpL = Math.sqrt( cpD.x*cpD.x + cpD.y*cpD.y ); // length of line
-						var cpM = { // normalised delta
-							x: cpD.x / cpL,
-							y: cpD.y / cpL
-						};
-						var radius = Math.max(srcW, srcH);
-						var cpProj = { // *2 radius guarantees outside shape
-							x: rs.cp2x + cpM.x * 2 * radius,
-							y: rs.cp2y + cpM.y * 2 * radius
-						};
-						/*
-						var tgtCtrlPtIntn = tgtShape.intersectLine(
-							tgtPos.x,
-							tgtPos.y,
-							tgtW,
-							tgtH,
-							cpProj.x,
-							cpProj.y,
-							tgtBorder / 2
-						);
-						*/
-						var tgtCtrlPtIntn = intersectLineSelection(this, tgt, cpProj.x, cpProj.y, edge._private.data.portTarget);
-
-						if( closeEndACp ){
-							rs.cp2x = rs.cp2x + cpM.x * (minCpADist - endACpDist); 
-							rs.cp2y = rs.cp2y + cpM.y * (minCpADist - endACpDist);
-						} else {
-							rs.cp2x = tgtCtrlPtIntn[0] + cpM.x * minCpADist; 
-							rs.cp2y = tgtCtrlPtIntn[1] + cpM.y * minCpADist;
-						}
-						
-					}
-
-					if( overlapping ){
-						// recalc endpts
-						this.findEndpoints( edge );
-					}
-				}
-
-				// project the edge into rstyle
-				this.projectBezier( edge );
-
-			}
-		}
-		
-		return hashTable;
-	};
+    return hashTable;
+  };
 
 	var _genPoints = function(pt, spacing, even) {
 

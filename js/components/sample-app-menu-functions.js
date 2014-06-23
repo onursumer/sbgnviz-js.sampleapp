@@ -32,6 +32,23 @@ window.onload = function() {
         });
 };
 
+// $( document ).ready( function() {
+//     var expanderOpts = {slicePoint: 150,
+//         expandPrefix: ' ',
+//         expandText: ' (...)',
+//         userCollapseText: ' (show less)',
+//         moreClass: 'expander-read-more',
+//         lessClass: 'expander-read-less',
+//         detailClass: 'expander-details',
+//         expandEffect: 'fadeIn',
+//         collapseEffect: 'fadeOut'
+//     };
+
+//     $(".biogene-info .expandable").expander(expanderOpts);
+//     expanderOpts.slicePoint = 2;
+//     expanderOpts.widow = 0;
+// });
+
 var sbgnLayoutProp = new SBGNLayout({
     el: '#sbgn-layout-table'
 });
@@ -153,6 +170,10 @@ $("#show-all").click(function(e){
     sbgnFiltering.showAll();
 });
 
+$("#delete-selected").click(function(e){
+    sbgnFiltering.deleteSelected();
+});
+
 $("#neighbors-of-selected").click(function(e){
     sbgnFiltering.highlightNeighborsofSelected();
 });
@@ -191,4 +212,21 @@ $("#save-as-sbgnml").click(function(evt){
     var filename = document.getElementById('file-name').innerHTML;
     saveAs(blob, filename);
 
+});
+
+$(document).on("click", ".biogene-info .expandable", function(evt){
+    var expanderOpts = {slicePoint: 150,
+        expandPrefix: ' ',
+        expandText: ' (...)',
+        userCollapseText: ' (show less)',
+        moreClass: 'expander-read-more',
+        lessClass: 'expander-read-less',
+        detailClass: 'expander-details',
+        expandEffect: 'fadeIn',
+        collapseEffect: 'fadeOut'
+    };
+
+    $(".biogene-info .expandable").expander(expanderOpts);
+    expanderOpts.slicePoint = 2;
+    expanderOpts.widow = 0;
 });

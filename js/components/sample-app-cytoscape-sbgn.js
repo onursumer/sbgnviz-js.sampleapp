@@ -138,18 +138,112 @@ var SBGNContainer = Backbone.View.extend({
                 window.cy = this;
                 container.cytoscapePanzoom();
 
-                cy.on('tap', function(evt){
-                });
-
-                cy.on('tap', 'node', function(evt){
-                    var node = this;
-                });
-
                 cy.on('tap', 'edge', function(evt){
                     var edge = this;
                 });
-            }
 
+                cy.on('mouseover', 'node', function(evt){
+                    var node = this;
+                    $(".qtip").remove();
+
+                    var label = node._private.data.sbgnlabel;
+
+                    if(typeof label === 'undefined' || label == "")
+                        return;
+
+                    cy.getElementById(node.id()).qtip({
+                        content : label,
+                        show: {
+                            ready: true,
+                            delay: 600
+                        },
+                        position: {
+                            my: 'top center',
+                            at: 'bottom center',
+                            adjust: {
+                              cyViewport: true
+                            }
+                        },
+                        style: {
+                            classes: 'qtip-bootstrap',
+                            tip: {
+                              width: 16,
+                              height: 8
+                            }
+                        }
+                    });
+                });
+
+                cy.on('click','node', function(event){
+                    var node = this;
+                    $(".qtip").remove();
+                    
+                    if(event.originalEvent.shiftKey)
+                        return;
+
+                    var queryScriptURL = "php/BioGeneQuery.php";
+                    var geneName = node._private.data.sbgnlabel;
+                    
+                    // set the query parameters
+                    var queryParams = 
+                    {
+                        query: geneName,
+                        org: "human",
+                        format: "json",
+                    };
+
+                    cy.getElementById(node.id()).qtip({
+                        content: {
+                            text: function(event, api) {
+                                $.ajax({
+                                    type: "POST",
+                                    url: queryScriptURL,
+                                    async: true,
+                                    data: queryParams,
+                                })
+                                .then(function(content) {
+                                    queryResult = JSON.parse(content);
+                                    if(queryResult.count > 0 && queryParams.query != "" && typeof queryParams.query != 'undefined')
+                                    {
+                                        var info = (new BioGeneView(
+                                        {
+                                            el: '#biogene-container',
+                                            model: queryResult.geneInfo[0]
+                                        })).render();
+                                        var html = $('#biogene-container').html();
+                                        api.set('content.text', html);
+                                    }
+                                    else{
+                                        api.set('content.text', "No additional information available &#013; for the selected node!");
+                                    }
+                                }, function(xhr, status, error) {
+                                    api.set('content.text', "Error retrieving data: " + error);
+                                });
+                                api.set('content.title', node._private.data.sbgnlabel);
+                                return _.template($("#loading-small-template").html());
+                            }
+                        },
+                        show: {
+                            ready: true
+                        },
+                        position: {
+                            my: 'top center',
+                            at: 'bottom center',
+                            adjust: {
+                              cyViewport: true
+                            },
+                            effect: false
+                        },
+                        style: {
+                            classes: 'qtip-bootstrap',
+                            tip: {
+                              width: 16,
+                              height: 8
+                            }
+                        }
+                    });
+                });
+            }
         };
         container.html("");
         container.cy(cyOptions);

@@ -219,7 +219,7 @@ var sbgnmlToJson = {
             if($(this).attr('id') == source){
                 sourceNodeId = source;
             }
-            else if($(this).attr('id') == target){
+            if($(this).attr('id') == target){
                 targetNodeId = target;
             }
         });

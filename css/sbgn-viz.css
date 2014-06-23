@@ -128,6 +128,13 @@ body {
 #fancybox-wrap {
     z-index : 4000 !important;
 }
+.qtip-bootstrap .qtip-titlebar{
+    background-color: #d67614;
+}
+
+.qtip-bootstrap{
+  border: 2px solid #d67614;
+}
 
 #sbgn-network-container {
     margin: auto;
@@ -146,13 +153,17 @@ body {
 
 .sbgn-label{
     float:right;
+    width: 100%
     text-align: right;
     color: #0B9BCD !important;
 }
 
 .input-file{
     float:left;
+width: 100%
     text-align: left;
+    color: #d67614 !important;
+    font-size: 12px !important;
 }
 
 .sbgn-nav-bar {
@@ -178,6 +189,11 @@ body {
 }
 
 .address-text {
+    font-size:11px;
+    text-align: center;
+}
+
+.node-details-text {
     font-size:11px;
     text-align: center;
 }

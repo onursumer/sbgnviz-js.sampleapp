@@ -1,6 +1,6 @@
 var sbgnFiltering = {
 
-	notHighlightNode : {'border-opacity': 0.3, 'text-opacity' : 0.3},
+	notHighlightNode : {'border-opacity': 0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
     notHighlightEdge : {'opacity':0.3, 'text-opacity' : 0.3, 'background-opacity': 0.3},
     processTypes : ['process', 'omitted process', 'uncertain process', 
         'association', 'dissociation', 'phenotype'],
@@ -41,25 +41,31 @@ var sbgnFiltering = {
         var neighborhoodEles = selectedEles.neighborhood();
         var nodesToHighlight = selectedEles.add(neighborhoodEles);
         nodesToHighlight = nodesToHighlight.add(nodesToHighlight.descendants());
+        nodesToHighlight.data("highlighted", 'true');
         this.highlightGraph(nodesToHighlight.nodes(), nodesToHighlight.edges());
     },
 
     highlightProcessesOfSelected: function(){
         var selectedEles = cy.elements(":selected");
         selectedEles = this.expandNodes(selectedEles);
+        selectedEles.data("highlighted", 'true');
         this.highlightGraph(selectedEles.nodes(), selectedEles.edges());
     },
 
     removeHighlights: function(){
         cy.nodes().removeCss(this.notHighlightNode);
         cy.edges().removeCss(this.notHighlightEdge);
+        cy.nodes().removeData("highlighted");
+        cy.edges().removeData("highlighted");
     },
 
     highlightGraph: function(nodes, edges){
-        cy.nodes().css(this.notHighlightNode);
-        cy.edges().css(this.notHighlightEdge);
-        nodes.removeCss(this.notHighlightNode);
-        edges.removeCss(this.notHighlightEdge);
+        cy.nodes("[highlighted!='true']").css(this.notHighlightNode);
+        cy.edges("[highlighted!='true']").css(this.notHighlightEdge);
+        cy.nodes("[highlighted='true']").removeCss(this.notHighlightNode);
+        cy.edges("[highlighted='true']").removeCss(this.notHighlightEdge);
+        // cy.nodes("[highlighted=true]").not(nodes).css(this.notHighlightNode);
+        // cy.edges().not(edges).css(this.notHighlightEdge);
     },
 
     expandNodes: function(nodesToShow){

@@ -1696,7 +1696,7 @@
 	}
 
 	$$.sbgn.colors = {
-		clone : "#787878", 
+		clone : "#a9a9a9", 
 		association : "#6B6B6B",
 		port : "#6B6B6B"
 	};
@@ -1720,12 +1720,12 @@
 		context.textBaseline = "middle";
 		var oldStyle  = context.fillStyle;
 		context.fillStyle = textProp.color;
-		//var oldOpacity = context.globalAlpha;
-		//context.globalAlpha = textProp.opacity;
+		var oldOpacity = context.globalAlpha;
+		context.globalAlpha = textProp.opacity;
 		context.fillText("" + truncateText(textProp, context), textProp.centerX, textProp.centerY);
 		context.fillStyle = oldStyle;
 		context.font = oldFont;
-		//context.globalAlpha = oldOpacity;
+		context.globalAlpha = oldOpacity;
 		//context.stroke();
 	};
 
@@ -1989,8 +1989,10 @@
 
 	$$.sbgn.cloneMarker = {
 		unspecifiedEntity : function(context, centerX, centerY, 
-			width, height, cloneMarker){
+			width, height, cloneMarker, opacity){
 			if(cloneMarker != null){
+				var oldGlobalAlpha = context.globalAlpha;
+				context.globalAlpha = opacity;
 				var oldStyle  = context.fillStyle;
 				context.fillStyle = $$.sbgn.colors.clone;
 
@@ -2013,17 +2015,18 @@
 
 				context.fill();
 			 	context.fillStyle = oldStyle;
+			 	context.globalAlpha = oldGlobalAlpha;
 			}
 		},
 
 		sourceAndSink : function(context, centerX, centerY, 
-			width, height, cloneMarker){
+			width, height, cloneMarker, opacity){
 			$$.sbgn.cloneMarker.unspecifiedEntity(context, centerX, centerY, 
-				width, height, cloneMarker);
+				width, height, cloneMarker, opacity);
 		},
 
 		simpleChemical : function(context, centerX, centerY, 
-			width, height, cloneMarker, isMultimer){
+			width, height, cloneMarker, isMultimer, opacity){
 			if(cloneMarker != null){
 				var cornerRadius = Math.min(width/2, height/2);
 
@@ -2033,13 +2036,15 @@
 				var secondCircleCenterY = centerY;
 
 				$$.sbgn.cloneMarker.unspecifiedEntity(context, firstCircleCenterX, firstCircleCenterY, 
-					2 * cornerRadius , 2 * cornerRadius, cloneMarker);
+					2 * cornerRadius , 2 * cornerRadius, cloneMarker, opacity);
 
 				$$.sbgn.cloneMarker.unspecifiedEntity(context, secondCircleCenterX, secondCircleCenterY, 
-					2 * cornerRadius, 2 * cornerRadius, cloneMarker);
+					2 * cornerRadius, 2 * cornerRadius, cloneMarker, opacity);
 
 				var oldStyle  = context.fillStyle;
 				context.fillStyle = $$.sbgn.colors.clone;
+				var oldGlobalAlpha = context.globalAlpha;
+				context.globalAlpha = opacity;
 
 				var recPoints = $$.math.generateUnitNgonPointsFitToSquare(4, 0);
 				var cloneX = centerX;
@@ -2049,11 +2054,12 @@
 
 				renderer.drawPolygon(context, cloneX, cloneY, cloneWidth, cloneHeight, recPoints);
 				context.fillStyle = oldStyle;
+				context.globalAlpha = oldGlobalAlpha;
 			}
 		},
 
 		perturbingAgent : function(context, centerX, centerY, 
-			width, height, cloneMarker){
+			width, height, cloneMarker, opacity){
 			if(cloneMarker != null){
 				var cloneWidth = width;
 				var cloneHeight = height / 4;
@@ -2064,6 +2070,8 @@
 
 				var oldStyle  = context.fillStyle;
 				context.fillStyle = $$.sbgn.colors.clone;
+				var oldGlobalAlpha = context.globalAlpha;
+				context.globalAlpha = opacity;
 
 				renderer.drawPolygon(context,
 					cloneX, cloneY,
@@ -2072,38 +2080,43 @@
 				context.fill();
 
 			 	context.fillStyle = oldStyle;
+			 	context.globalAlpha = oldGlobalAlpha;
 			 	//context.stroke();
 			}
 		},
 
 		nucleicAcidFeature : function(context, centerX, centerY, 
-			width, height, cloneMarker, isMultimer){
+			width, height, cloneMarker, isMultimer, opacity){
 			if(cloneMarker != null){
 				var cloneWidth = width;
 				var cloneHeight = height / 4;
 				var cloneX = centerX;
 				var cloneY = centerY + 3 * height / 8;
+
 				var oldStyle  = context.fillStyle;
 				context.fillStyle = $$.sbgn.colors.clone;
+				var oldGlobalAlpha = context.globalAlpha;
+				context.globalAlpha = opacity;
 
 				var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
 
 				$$.sbgn.drawNucAcidFeature(context, cloneWidth, cloneHeight, 
-					cloneX, cloneY, cornerRadius);
+					cloneX, cloneY, cornerRadius, opacity);
 
 			 	context.fillStyle = oldStyle;
+			 	context.globalAlpha = oldGlobalAlpha;
 			 	//context.stroke();
 			}
 		},
 
 		macromolecule : function(context, centerX, centerY, 
-			width, height, cloneMarker, isMultimer){
+			width, height, cloneMarker, isMultimer, opacity){
 			$$.sbgn.cloneMarker.nucleicAcidFeature(context, centerX, centerY, 
-				width, height, cloneMarker, isMultimer);
+				width, height, cloneMarker, isMultimer, opacity);
 		},
 
 		complex : function(context, centerX, centerY, 
-			width, height, cornerLength, cloneMarker, isMultimer){
+			width, height, cornerLength, cloneMarker, isMultimer, opacity){
 			if(cloneMarker != null){
 				var cpX = cornerLength / width;
 				var cpY = cornerLength / height;
@@ -2116,12 +2129,15 @@
 
 				var oldStyle  = context.fillStyle;
 				context.fillStyle = $$.sbgn.colors.clone;
+				var oldGlobalAlpha = context.globalAlpha;
+				context.globalAlpha = opacity;
 
 				renderer.drawPolygon(context,
 					cloneX, cloneY,
 					cloneWidth, cloneHeight, markerPoints);
 
 			 	context.fillStyle = oldStyle;
+			 	context.globalAlpha = oldGlobalAlpha;
 			 	//context.stroke();
 			}
 		}
@@ -2834,7 +2850,8 @@
 
 				$$.sbgn.cloneMarker.complex(context, 
 					centerX + multimerPadding, centerY + multimerPadding, 
-					width, height, cornerLength, cloneMarker, true);
+					width, height, cornerLength, cloneMarker, true, 
+					node._private.style['background-opacity'].value);
 
 				//context.stroke();
 			}
@@ -2846,7 +2863,8 @@
 			context.stroke();
 
 			$$.sbgn.cloneMarker.complex(context, centerX, centerY, 
-				width, height, cornerLength, cloneMarker, false);
+				width, height, cornerLength, cloneMarker, false, 
+				node._private.style['background-opacity'].value);
 
 			$$.sbgn.drawComplexStateAndInfo(context, node, stateAndInfos, centerX, centerY, width, height);
 
@@ -3023,7 +3041,8 @@
 
 				$$.sbgn.cloneMarker.macromolecule(context, 
 					centerX + multimerPadding, centerY + multimerPadding, 
-					width, height, cloneMarker, true);
+					width, height, cloneMarker, true, 
+					node._private.style['background-opacity'].value);
 
 				//context.stroke();
 			}
@@ -3035,7 +3054,8 @@
 			context.stroke();
 
 			$$.sbgn.cloneMarker.macromolecule(context, centerX, centerY, 
-				width, height, cloneMarker, false);
+				width, height, cloneMarker, false, 
+				node._private.style['background-opacity'].value);
 
 			$$.sbgn.drawStateAndInfos(node, context, centerX, centerY);
 
@@ -3190,7 +3210,8 @@
 
 				$$.sbgn.cloneMarker.nucleicAcidFeature(context, 
 					centerX + multimerPadding, centerY + multimerPadding, 
-					width, height, cloneMarker, true);
+					width, height, cloneMarker, true, 
+					node._private.style['background-opacity'].value);
 
 				//context.stroke();
 			}
@@ -3201,7 +3222,8 @@
 			context.stroke();
 
 			$$.sbgn.cloneMarker.nucleicAcidFeature(context, centerX, centerY, 
-				width, height, cloneMarker, false);
+				width, height, cloneMarker, false, 
+				node._private.style['background-opacity'].value);
 
 			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY,
 				'opacity':node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
@@ -3348,7 +3370,8 @@
 			context.stroke();
 
 			$$.sbgn.cloneMarker.perturbingAgent(context, centerX, centerY, 
-				width, height, cloneMarker);
+				width, height, cloneMarker, 
+				node._private.style['background-opacity'].value);
 
 			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY,
 				'opacity':node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
@@ -3467,7 +3490,8 @@
 
 				$$.sbgn.cloneMarker.simpleChemical(context, 
 					centerX + multimerPadding, centerY + multimerPadding, 
-					width - padding, height - padding, cloneMarker, true);
+					width - padding, height - padding, cloneMarker, true, 
+					node._private.style['background-opacity'].value);
 
 				//context.stroke();
 			}
@@ -3479,7 +3503,8 @@
 			context.stroke();
 			
 			$$.sbgn.cloneMarker.simpleChemical(context, centerX, centerY, 
-				width - padding, height - padding, cloneMarker, false);
+				width - padding, height - padding, cloneMarker, false, 
+				node._private.style['background-opacity'].value);
 
 			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY,
 				'opacity':node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};
@@ -3634,7 +3659,8 @@
 			context.stroke();
 
 			$$.sbgn.cloneMarker.sourceAndSink(context, centerX, centerY, 
-				width, height, cloneMarker);	
+				width, height, cloneMarker, 
+				node._private.style['background-opacity'].value);	
 
 		},
 
@@ -3800,7 +3826,8 @@
 			context.stroke();
 
 			$$.sbgn.cloneMarker.unspecifiedEntity(context, centerX, centerY, 
-					width, height, cloneMarker);
+					width, height, cloneMarker, 
+					node._private.style['background-opacity'].value);
 
 			var nodeProp = {'label':label, 'centerX':centerX, 'centerY':centerY,
 				'opacity':node._private.style['text-opacity'].value, 'width': node.width(), 'height': node.height()};

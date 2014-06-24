@@ -103,13 +103,43 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             'height' : 15
 }); // end of sbgnStyleSheet
 
+var NotyView = Backbone.View.extend({
+    render: function() {
+        //this.model["theme"] = "pcvizTheme";
+        this.model["layout"] = "bottomRight";
+
+        if(this.options.timeout != undefined)
+            this.model["timeout"] = this.options.timeout;
+        else
+            this.model["timeout"] = 8000;
+
+        this.model["text"] = "Right click to a node to see detailed information";
+
+        if(this.options.warning != undefined && this.options.warning)
+            this.model["type"] = "warning";
+
+        if(this.options.error != undefined && this.options.error)
+            this.model["type"] = "error";
+
+
+        noty(this.model);
+        return this;
+    }
+});
+
 var SBGNContainer = Backbone.View.extend({
     cyStyle: sbgnStyleSheet,
 
     render: function(){
+        (new NotyView({
+            template: "#noty-info",
+            model: {}
+        })).render();
+
         var container = $(this.el);
         // container.html("");
         // container.append(_.template($("#loading-template").html()));
+
 
         var cytoscapeJsGraph = (this.model.cytoscapeJsGraph);
 
@@ -138,48 +168,13 @@ var SBGNContainer = Backbone.View.extend({
                 window.cy = this;
                 container.cytoscapePanzoom();
 
-                cy.on('tap', 'edge', function(evt){
-                    var edge = this;
-                });
-
                 cy.on('mouseover', 'node', function(evt){
-                    var node = this;
-                    $(".qtip").remove();
 
-                    var label = node._private.data.sbgnlabel;
-
-                    if(typeof label === 'undefined' || label == "")
-                        return;
-
-                    cy.getElementById(node.id()).qtip({
-                        content : label,
-                        show: {
-                            ready: true,
-                            delay: 600
-                        },
-                        position: {
-                            my: 'top center',
-                            at: 'bottom center',
-                            adjust: {
-                              cyViewport: true
-                            }
-                        },
-                        style: {
-                            classes: 'qtip-bootstrap',
-                            tip: {
-                              width: 16,
-                              height: 8
-                            }
-                        }
-                    });
                 });
 
-                cy.on('click','node', function(event){
+                cy.on('cxttap','node', function(event){
                     var node = this;
                     $(".qtip").remove();
-                    
-                    if(event.originalEvent.shiftKey)
-                        return;
 
                     var queryScriptURL = "php/BioGeneQuery.php";
                     var geneName = node._private.data.sbgnlabel;
@@ -233,6 +228,40 @@ var SBGNContainer = Backbone.View.extend({
                               cyViewport: true
                             },
                             effect: false
+                        },
+                        style: {
+                            classes: 'qtip-bootstrap',
+                            tip: {
+                              width: 16,
+                              height: 8
+                            }
+                        }
+                    });
+                });
+
+                cy.on('tap','node', function(event){
+                    var node = this;
+                    $(".qtip").remove();
+
+                    if(event.originalEvent.shiftKey)
+                        return;
+
+                    var label = node._private.data.sbgnlabel;
+
+                    if(typeof label === 'undefined' || label == "")
+                        return;
+
+                    cy.getElementById(node.id()).qtip({
+                        content : label,
+                        show: {
+                            ready: true,
+                        },
+                        position: {
+                            my: 'top center',
+                            at: 'bottom center',
+                            adjust: {
+                              cyViewport: true
+                            }
                         },
                         style: {
                             classes: 'qtip-bootstrap',

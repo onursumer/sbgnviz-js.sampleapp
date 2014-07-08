@@ -166,7 +166,7 @@ var sbgnmlToJson = {
         self.addParentInfoToNode(ele, nodeObj, parent, compartments);
 
         //add clone information
-        if($(ele).find('clone').length > 0)
+        if($(ele).children('clone').length > 0)
             nodeObj.sbgnclonemarker = true;
         else
             nodeObj.sbgnclonemarker = undefined;
@@ -255,7 +255,7 @@ var sbgnmlToJson = {
         }
         else{
             $(ele).children('glyph').each(function(){
-                if($(this).attr('class') != 'cardinality'){
+                if($(this).attr('class') == 'cardinality'){
                     edgeObj.sbgncardinality = $(this).find('label').attr('text');
                 }
             });

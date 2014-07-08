@@ -12,7 +12,9 @@ var sbgnStyleSheet = cytoscape.stylesheet()
         .css({
             'background-color' : '#F4F3EE',
             'padding-bottom' : '20',
-            'padding-top' : '20'
+            'padding-top' : '20',
+            'padding-left' : '20',
+            'padding-right' : '20'
         })
         .selector("node[sbgnclass='compartment']")
         .css({
@@ -21,7 +23,11 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             'content' : 'data(sbgnlabel)',
             'text-valign' : 'bottom',
             'text-halign' : 'center',
-            'font-size' : '20'
+            'font-size' : '20',
+            'padding-bottom' : '20',
+            'padding-top' : '20',
+            'padding-left' : '20',
+            'padding-right' : '20'
         })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
         .css({
@@ -105,22 +111,10 @@ var sbgnStyleSheet = cytoscape.stylesheet()
 
 var NotyView = Backbone.View.extend({
     render: function() {
-        //this.model["theme"] = "pcvizTheme";
+        //this.model["theme"] = " twitter bootstrap";
         this.model["layout"] = "bottomRight";
-
-        if(this.options.timeout != undefined)
-            this.model["timeout"] = this.options.timeout;
-        else
-            this.model["timeout"] = 8000;
-
-        this.model["text"] = "Right click to a node to see detailed information";
-
-        if(this.options.warning != undefined && this.options.warning)
-            this.model["type"] = "warning";
-
-        if(this.options.error != undefined && this.options.error)
-            this.model["type"] = "error";
-
+        this.model["timeout"] = 8000;
+        this.model["text"] = "Right click on a gene to see its details!";
 
         noty(this.model);
         return this;
@@ -166,7 +160,11 @@ var SBGNContainer = Backbone.View.extend({
             ready: function()
             {
                 window.cy = this;
-                container.cytoscapePanzoom();
+
+                var panProps = ({
+                    fitPadding: 10,
+                });
+                container.cytoscapePanzoom(panProps);
 
                 cy.on('mouseover', 'node', function(evt){
 
@@ -175,6 +173,11 @@ var SBGNContainer = Backbone.View.extend({
                 cy.on('cxttap','node', function(event){
                     var node = this;
                     $(".qtip").remove();
+
+                    var geneClass = node._private.data.sbgnclass;
+                    if(geneClass != 'macromolecule' && geneClass != 'nucleic acid feature' &&
+                        geneClass != 'unspecified entity')
+                        return;
 
                     var queryScriptURL = "php/BioGeneQuery.php";
                     var geneName = node._private.data.sbgnlabel;

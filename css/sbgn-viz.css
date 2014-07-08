@@ -122,12 +122,13 @@ body {
 }
 
 .ui-widget-header .ui-icon {
-    background-image: url(images/ui-icons_90B6CB_256x240.png);
+    background-image: url(images/ui-icons_0B9BCD_256x240.png);
 }
 
 #fancybox-wrap {
     z-index : 4000 !important;
 }
+
 .qtip-bootstrap .qtip-titlebar{
     background-color: #F7CAA9;
 }

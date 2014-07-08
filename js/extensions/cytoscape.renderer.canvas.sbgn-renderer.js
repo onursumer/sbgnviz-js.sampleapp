@@ -39,7 +39,9 @@
 		'tag' : true, 'consumption' : true, 'production' : true, 'modulation' : true, 
 		'stimulation' : true, 'catalysis' : true, 'inhibition' : true, 'necessary stimulation' : true,
 		'logic arc' : true, 'equivalence arc' : true, 'and operator' : true,
-		'or operator' : true, 'not operator' : true, 'and' : true, 'or' : true, 'not' : true};
+		'or operator' : true, 'not operator' : true, 'and' : true, 'or' : true, 'not' : true,
+		'nucleic acid feature multimer' : true, 'macromolecule multimer' : true, 
+		'simple chemical multimer' : true, 'complex multimer' : true};
 
 	var CanvasRenderer = $$('renderer', 'canvas');
 	var renderer = CanvasRenderer.prototype;
@@ -1324,7 +1326,7 @@
 		var textProp = {'centerX': 0, 'centerY' : 13/2,
 			'opacity':edge._private.style['text-opacity'].value, 
 			'width': 13, 'label': cardinality};
-		$$.sbgn.drawLabelText(context, textProp);
+		$$.sbgn.drawCardinalityText(context, textProp);
 
 		context.rotate(Math.PI/2);
 		
@@ -1358,8 +1360,8 @@
 	    	startX = edge._private.rscratch.arrowEndX;
 	    	startY = edge._private.rscratch.arrowEndY;
 	    }
-	    
-	    var srcPos = edge.source().position();
+	    var srcPos = (type === "consumption") ? edge.source().position() : edge.target().position();
+	    //var srcPos = edge.source().position();
 	    dispX = startX - srcPos.x;
 	    dispY = startY - srcPos.y;
 
@@ -1374,27 +1376,15 @@
 	    context.translate(startX, startY);
 	   	context.rotate(-angle);
 
-	   	if(type === "consumption" && length > carProp.distanceToSource){
-			context.rect(0, -carProp.distanceToSource, carProp.boxLength, carProp.boxLength);
+	   	if(length > carProp.distanceToNode){
+			context.rect(0, -carProp.distanceToNode, carProp.boxLength, carProp.boxLength);
 			
 			context.rotate(Math.PI/2);
 
-			var textProp = {'centerX': -carProp.distanceToSource + carProp.boxLength/2, 'centerY':-carProp.boxLength/2,
+			var textProp = {'centerX': -carProp.distanceToNode + carProp.boxLength/2, 'centerY':-carProp.boxLength/2,
 				'opacity':edge._private.style['text-opacity'].value, 
 				'width': carProp.boxLength, 'label': cardinality};
-			$$.sbgn.drawLabelText(context, textProp);
-
-			context.rotate(-Math.PI/2);
-		}
-		else if(length > carProp.distanceToTarget){
-			context.rect(0, carProp.distanceToTarget, carProp.boxLength, carProp.boxLength);
-			
-			context.rotate(Math.PI/2);
-
-			var textProp = {'centerX': carProp.distanceToTarget + carProp.boxLength/2, 'centerY' : -carProp.boxLength/2,
-				'opacity':edge._private.style['text-opacity'].value, 
-				'width': carProp.boxLength, 'label': cardinality};
-			$$.sbgn.drawLabelText(context, textProp);
+			$$.sbgn.drawCardinalityText(context, textProp);
 
 			context.rotate(-Math.PI/2);
 		}
@@ -1690,8 +1680,7 @@
 	$$.sbgn.cardinalityProperties = function(){
 		return {
 			boxLength : 13,
-			distanceToTarget : 20,
-			distanceToSource : 25
+			distanceToNode : 25,
 		};
 	}
 
@@ -1706,14 +1695,19 @@
 	    var text = (typeof textProp.label === 'undefined') ? "" : textProp.label;
 	    var len = text.length;
 	    var ellipsis = "...";
-	    while ((width = context.measureText(text).width) > textProp.width - 10) {
+		
+		//if(context.measureText(text).width < textProp.width)
+		//	return text;
+		var textWidth = ( textProp.width > 10) ? textProp.width - 10 : textProp.width;
+		
+	    while ((width = context.measureText(text).width) > textWidth) {
 	        --len;
 	        text = text.substring(0, len) + ellipsis;
 	    }
 	    return text;
 	};
 
-	$$.sbgn.drawText = function(context, textProp){
+	$$.sbgn.drawText = function(context, textProp, truncate){
 		var oldFont = context.font;
 		context.font = textProp.font;
 		context.textAlign = "center";
@@ -1722,7 +1716,14 @@
 		context.fillStyle = textProp.color;
 		var oldOpacity = context.globalAlpha;
 		context.globalAlpha = textProp.opacity;
-		context.fillText("" + truncateText(textProp, context), textProp.centerX, textProp.centerY);
+		var text;
+		if(truncate == false){
+			text = textProp.label;
+		}
+		else{
+			text = truncateText(textProp, context);
+		}
+		context.fillText(text, textProp.centerX, textProp.centerY);
 		context.fillStyle = oldStyle;
 		context.font = oldFont;
 		context.globalAlpha = oldOpacity;
@@ -1734,6 +1735,12 @@
 		textProp.font = "9px Arial";
 		$$.sbgn.drawText(context, textProp);
 	};
+
+	$$.sbgn.drawCardinalityText = function(context, textProp){
+		textProp.color = "#0f0f0f";
+		textProp.font = "9px Arial";
+		$$.sbgn.drawText(context, textProp, false);
+	}
 
 	$$.sbgn.drawDynamicLabelText = function(context, textProp){
 		var textHeight = parseInt(textProp.height/3);
@@ -1987,6 +1994,68 @@
 		context.fill();
 	};
 
+	function simpleChemicalLeftClone(context, centerX, centerY, 
+			width, height, cloneMarker, opacity){
+		if(cloneMarker != null){
+			var oldGlobalAlpha = context.globalAlpha;
+			context.globalAlpha = opacity;
+			var oldStyle  = context.fillStyle;
+			context.fillStyle = $$.sbgn.colors.clone;
+
+			context.beginPath();
+			context.translate(centerX, centerY);
+			context.scale(width / 2, height / 2);
+
+			var markerBeginX = - 1 * Math.sin(Math.PI/3);
+			var markerBeginY = Math.cos(Math.PI/3);
+			var markerEndX = 0;
+			var markerEndY = markerBeginY;
+
+			context.moveTo(markerBeginX,markerBeginY);
+			context.lineTo(markerEndX,markerEndY);
+			context.arc(0, 0, 1, 3*Math.PI/6, 5*Math.PI/6);
+
+			context.scale(2/width, 2/height);
+			context.translate(-centerX, -centerY);
+			context.closePath();
+
+			context.fill();
+		 	context.fillStyle = oldStyle;
+		 	context.globalAlpha = oldGlobalAlpha;
+		}
+	};
+
+	function simpleChemicalRightClone(context, centerX, centerY, 
+			width, height, cloneMarker, opacity){
+		if(cloneMarker != null){
+			var oldGlobalAlpha = context.globalAlpha;
+			context.globalAlpha = opacity;
+			var oldStyle  = context.fillStyle;
+			context.fillStyle = $$.sbgn.colors.clone;
+
+			context.beginPath();
+			context.translate(centerX, centerY);
+			context.scale(width / 2, height / 2);
+
+			var markerBeginX = 0;
+			var markerBeginY = Math.cos(Math.PI/3);
+			var markerEndX = 1 * Math.sin(Math.PI/3);
+			var markerEndY = markerBeginY;
+
+			context.moveTo(markerBeginX,markerBeginY);
+			context.lineTo(markerEndX,markerEndY);
+			context.arc(0, 0, 1, Math.PI/6, 3*Math.PI/6);
+
+			context.scale(2/width, 2/height);
+			context.translate(-centerX, -centerY);
+			context.closePath();
+
+			context.fill();
+		 	context.fillStyle = oldStyle;
+		 	context.globalAlpha = oldGlobalAlpha;
+		}
+	};
+
 	$$.sbgn.cloneMarker = {
 		unspecifiedEntity : function(context, centerX, centerY, 
 			width, height, cloneMarker, opacity){
@@ -2035,10 +2104,10 @@
 				var secondCircleCenterX = centerX + width/2 - cornerRadius;
 				var secondCircleCenterY = centerY;
 
-				$$.sbgn.cloneMarker.unspecifiedEntity(context, firstCircleCenterX, firstCircleCenterY, 
+				simpleChemicalLeftClone(context, firstCircleCenterX, firstCircleCenterY, 
 					2 * cornerRadius , 2 * cornerRadius, cloneMarker, opacity);
 
-				$$.sbgn.cloneMarker.unspecifiedEntity(context, secondCircleCenterX, secondCircleCenterY, 
+				simpleChemicalRightClone(context, secondCircleCenterX, secondCircleCenterY, 
 					2 * cornerRadius, 2 * cornerRadius, cloneMarker, opacity);
 
 				var oldStyle  = context.fillStyle;
@@ -2286,7 +2355,7 @@
 
 		//check rectangle at top
 		if ($$.math.pointInsidePolygon(x, y, points,
-			centerX, centerY -  cornerRadius/2, width, height - cornerRadius, [0, -1], 
+			centerX, centerY -  cornerRadius/2, width, height - cornerRadius/3, [0, -1], 
 			padding)) {
 			return true;
 		}
@@ -2758,9 +2827,9 @@
 			var port = node._private.data.ports[i];
 			var portX = port.x + centerX;
 			var portY = port.y + centerY;
-			var closestPoint = $$.math.polygonIntersectLine(centerX, centerY, 
-				points, portX, portY, width/2, height/2, padding);
-			context.beginPath()
+			var closestPoint = $$.math.polygonIntersectLine(portX, portY, 
+				points, centerX, centerY, width/2, height/2, padding);
+			context.beginPath();
 			context.moveTo(portX, portY);
 			context.lineTo(closestPoint[0], closestPoint[1]);
 			context.stroke();
@@ -2814,13 +2883,15 @@
 	nodeShape.push('unspecified entity', 'simple chemical', 'macromolecule', 'nucleic acid feature',
 		'perturbing agent', 'source and sink', 'complex', 'process', 'omitted process',
 		'uncertain process', 'association', 'dissociation', 'phenotype', 'compartment',
-		'tag', 'and operator', 'or operator', 'not operator', 'and', 'or', 'not');
+		'tag', 'and operator', 'or operator', 'not operator', 'and', 'or', 'not',
+		'nucleic acid feature multimer', 'macromolecule multimer', 'simple chemical multimer', 
+		'complex multimer');
 
 	var nodeShapes = CanvasRenderer.nodeShapes;
 
 	nodeShapes["complex"] = {
 		points: [],
-		multimerPadding:3,
+		multimerPadding:5,
 		cornerLength:12,
 
 		draw: function(context, node) {
@@ -3016,7 +3087,7 @@
 
 	nodeShapes["macromolecule"] = {
 		points: $$.math.generateUnitNgonPoints(4, 0),
-		multimerPadding:2,
+		multimerPadding:5,
 
 		draw: function(context, node) {
 			var width = node.width();
@@ -3184,8 +3255,8 @@
 	};
 
 	nodeShapes["nucleic acid feature"] = {
-		points: $$.math.generateUnitNgonPoints(4, 0),
-		multimerPadding:2,
+		points: $$.math.generateUnitNgonPointsFitToSquare(4, 0),
+		multimerPadding:5,
 
 		draw: function(context, node) {
 			var centerX = node._private.position.x;
@@ -3239,7 +3310,7 @@
 		intersectLine: function(node, x, y, portId) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;
-			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
 			var width = node.width();
 			var height = node.height();
 			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
@@ -3274,7 +3345,7 @@
 			var centerY = node._private.position.y;
 			var width = node.width();
 			var height = node.height();
-			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
 			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
 
 			var nodeIntersectBox = $$.sbgn.nucleicAcidIntersectionBox(
@@ -3302,7 +3373,7 @@
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
 			var cornerRadius = $$.math.getRoundRectangleRadius(width, height);
-			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var multimerPadding = nodeShapes["nucleic acid feature"].multimerPadding;
 
 			var nodeCheckPointRough = $$.math.checkInBoundingBox(
 				x, y, nodeShapes["nucleic acid feature"].points, 
@@ -3467,7 +3538,7 @@
 	};
 
 	nodeShapes["simple chemical"] = {
-		multimerPadding:3,
+		multimerPadding:5,
 
 		draw: function(context, node) {
 			var centerX = node._private.position.x;
@@ -3522,7 +3593,7 @@
 			var width = node.width();
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
-			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
 
 			var portIntersection = $$.sbgn.intersectLinePorts(node, x, y, portId);
 			if(portIntersection.length > 0){
@@ -3554,7 +3625,7 @@
 			var width = node.width();
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
-			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
 
 			var nodeIntersectBox = nodeShapes["roundrectangle"].intersectBox(
 				x1, y1, x2, y2, width, 
@@ -3582,7 +3653,7 @@
 			var width = node.width();
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
-			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
 
 			var nodeCheckPointRough = nodeShapes["roundrectangle"].checkPointRough(x, y, 
 				padding, width, height, centerX, centerY);
@@ -3607,7 +3678,7 @@
 			var width = node.width();
 			var height = node.height();
 			var padding = node._private.style["border-width"].pxValue / 2;
-			var multimerPadding = nodeShapes["complex"].multimerPadding;
+			var multimerPadding = nodeShapes["simple chemical"].multimerPadding;
 
 			var nodeCheckPoint =  nodeShapes["roundrectangle"].checkPoint(x, y, 
 				padding, width, height, 
@@ -3807,14 +3878,12 @@
 	};
 
 	nodeShapes["unspecified entity"] = {
-		multimerPadding:3,
 
 		draw: function(context, node) {
 			var centerX = node._private.position.x;
 			var centerY = node._private.position.y;;
 			var width = node.width();
 			var height = node.height();
-			var multimerPadding = nodeShapes["unspecified entity"].multimerPadding;
 			var sbgnClass = node._private.data.sbgnclass;
 			var label = node._private.data.sbgnlabel;
 			var cloneMarker = node._private.data.sbgnclonemarker;
@@ -3977,7 +4046,6 @@
 			var width = node.width();
 			var height = node.height();
 			var padding = node._private.style['border-width'].pxValue / 2;
-
 			return nodeShapes['ellipse'].checkPoint(x, y, padding, width,
 				height, centerX, centerY);
 		}
@@ -4167,9 +4235,16 @@
 			var padding = node._private.style["border-width"].pxValue;
 
 			var oldStyle = context.fillStyle;
+			var oldAlpha = context.globalAlpha;
+
 			context.fillStyle = $$.sbgn.colors.association;
+			context.globalAlpha = node._private.style['background-opacity'].value;
+
 			nodeShapes['ellipse'].draw(context, centerX, centerY, width, height);
+			
 			context.fillStyle = oldStyle;
+			context.globalAlpha = oldAlpha;
+
 	    	nodeShapes['ellipse'].drawPath(context, centerX, centerY, width, height);
 			context.stroke();
 
@@ -4335,6 +4410,13 @@
 	nodeShapes['not'] = nodeShapes['not operator'];
 
 	nodeShapes['compartment'] = nodeShapes['roundrectangle'];
+
+	//adding multimer shapes
+	nodeShapes['macromolecule multimer'] = nodeShapes['macromolecule'];
+	nodeShapes['nucleic acid feature multimer'] = nodeShapes['nucleic acid feature'];
+	nodeShapes['simple chemical multimer'] = nodeShapes['simple chemical'];
+	nodeShapes['complex multimer'] = nodeShapes['complex'];
+
 	
 })( cytoscape );
 
@@ -4427,3 +4509,5 @@
 	arrowShapes['equivalence arc'] = arrowShapes['none'];
 
 })( cytoscape );
+
+//converter functions

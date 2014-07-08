@@ -13,7 +13,7 @@ var sbgnFiltering = {
     },
 
     hideSelected: function(){
-        var allNodes = cy.nodes();
+        var allNodes = cy.nodes(":visible");
         var selectedNodes = cy.nodes(":selected");
         var nodesToShow = this.expandRemainingNodes(selectedNodes, allNodes);
         this.applyFilter(allNodes.not(nodesToShow));
@@ -53,17 +53,17 @@ var sbgnFiltering = {
     },
 
     removeHighlights: function(){
-        cy.nodes().removeCss(this.notHighlightNode);
-        cy.edges().removeCss(this.notHighlightEdge);
-        cy.nodes().removeData("highlighted");
-        cy.edges().removeData("highlighted");
+        cy.nodes(":visible").nodes("[highlighted!='true']").removeCss(this.notHighlightNode);
+        cy.edges(":visible").edges("[highlighted!='true']").removeCss(this.notHighlightEdge);
+        cy.nodes(":visible").nodes().removeData("highlighted");
+        cy.edges(":visible").edges().removeData("highlighted");
     },
 
     highlightGraph: function(nodes, edges){
-        cy.nodes("[highlighted!='true']").css(this.notHighlightNode);
-        cy.edges("[highlighted!='true']").css(this.notHighlightEdge);
-        cy.nodes("[highlighted='true']").removeCss(this.notHighlightNode);
-        cy.edges("[highlighted='true']").removeCss(this.notHighlightEdge);
+        cy.nodes(":visible").nodes("[highlighted!='true']").css(this.notHighlightNode);
+        cy.edges(":visible").edges("[highlighted!='true']").css(this.notHighlightEdge);
+        cy.nodes(":visible").nodes("[highlighted='true']").removeCss(this.notHighlightNode);
+        cy.edges(":visible").edges("[highlighted='true']").removeCss(this.notHighlightEdge);
         // cy.nodes("[highlighted=true]").not(nodes).css(this.notHighlightNode);
         // cy.edges().not(edges).css(this.notHighlightEdge);
     },

@@ -526,7 +526,7 @@
 		var style = edge._private.style;
 
 		// var srcPos = edge.source().position();
-		var srcPos = addPortReplacementIfAny(edge.source()[0], edge._private.data.portSource);
+		var srcPos = addPortReplacementIfAny(edge.source()[0], edge._private.data.portsource);
 
 		dispX = startX - srcPos.x;
 		dispY = startY - srcPos.y;
@@ -559,7 +559,7 @@
 		var endY = edge._private.rscratch.arrowEndY;
 
 		// var tgtPos = edge.target().position();
-		var tgtPos = addPortReplacementIfAny(edge.target()[0], edge._private.data.portTarget);
+		var tgtPos = addPortReplacementIfAny(edge.target()[0], edge._private.data.porttarget);
 
 		dispX = endX - tgtPos.x;
 		dispY = endY - tgtPos.y;
@@ -608,7 +608,7 @@
 			var cp = [rs.cp2cx, rs.cp2cy];
 
 			intersect = intersectLineSelection(this, target, cp[0], cp[1],
-				edge._private.data.portTarget);
+				edge._private.data.porttarget);
 			
 			var arrowEnd = $$.math.shortenIntersection(intersect, cp,
 				CanvasRenderer.arrowShapes[tgtArShape].spacing(edge));
@@ -624,7 +624,7 @@
 			var cp = [rs.cp2ax, rs.cp2ay];
 
 			intersect = intersectLineSelection(this, source, cp[0], cp[1],
-				edge._private.data.portSource);
+				edge._private.data.portsource);
 			
 			var arrowStart = $$.math.shortenIntersection(intersect, cp,
 				CanvasRenderer.arrowShapes[srcArShape].spacing(edge));
@@ -639,10 +639,10 @@
 			rs.arrowStartY = arrowStart[1];
 			
 		} else if (rs.edgeType == "straight") {
-			var sourcePos = addPortReplacementIfAny(source, edge._private.data.portSource);
+			var sourcePos = addPortReplacementIfAny(source, edge._private.data.portsource);
 
 			intersect = intersectLineSelection(this, target, sourcePos.x, 
-				sourcePos.y, edge._private.data.portTarget);
+				sourcePos.y, edge._private.data.porttarget);
 				
 			if (intersect.length == 0) {
 				rs.noArrowPlacement = true;
@@ -664,10 +664,10 @@
 			rs.arrowEndX = arrowEnd[0];
 			rs.arrowEndY = arrowEnd[1];
 
-			var targetPos = addPortReplacementIfAny(target, edge._private.data.portTarget);
+			var targetPos = addPortReplacementIfAny(target, edge._private.data.porttarget);
 
 			intersect = intersectLineSelection(this, source, targetPos.x, 
-				targetPos.y, edge._private.data.portSource);
+				targetPos.y, edge._private.data.portsource);
 
 			if (intersect.length == 0) {
 				rs.noArrowPlacement = true;
@@ -695,7 +695,7 @@
 			var cp = [rs.cp2x, rs.cp2y];
 
 			intersect = intersectLineSelection(this, target, cp[0], cp[1],
-				edge._private.data.portTarget);
+				edge._private.data.porttarget);
 			
 			var arrowEnd = $$.math.shortenIntersection(intersect, cp,
 				CanvasRenderer.arrowShapes[tgtArShape].spacing(edge));
@@ -709,7 +709,7 @@
 			rs.arrowEndY = arrowEnd[1];
 			
 			intersect = intersectLineSelection(this, source, cp[0], cp[1],
-				edge._private.data.portSource);
+				edge._private.data.portsource);
 			
 			var arrowStart = $$.math.shortenIntersection(intersect, cp,
 				CanvasRenderer.arrowShapes[srcArShape].spacing(edge)
@@ -977,14 +977,14 @@
         edge = hashTable[pairId][i];
         rs = edge._private.rscratch;
 
-		var tgtPos2 = addPortReplacementIfAny(edge.target()[0], edge._private.data.portTarget);
-		var srcPos2 = addPortReplacementIfAny(edge.source()[0], edge._private.data.portSource);
+		var tgtPos2 = addPortReplacementIfAny(edge.target()[0], edge._private.data.porttarget);
+		var srcPos2 = addPortReplacementIfAny(edge.source()[0], edge._private.data.portsource);
 
 		// pt outside src shape to calc distance/displacement from src to tgt
-		var srcOutside = intersectLineSelection(this, src, tgtPos2.x, tgtPos2.y, edge._private.data.portSource);
+		var srcOutside = intersectLineSelection(this, src, tgtPos2.x, tgtPos2.y, edge._private.data.portsource);
 
 		// pt outside tgt shape to calc distance/displacement from src to tgt
-		var tgtOutside = intersectLineSelection(this, tgt, srcPos2.x, srcPos2.y, edge._private.data.portTarget);
+		var tgtOutside = intersectLineSelection(this, tgt, srcPos2.x, srcPos2.y, edge._private.data.porttarget);
         
         var edgeIndex1 = rs.lastEdgeIndex;
         var edgeIndex2 = i;
@@ -1119,7 +1119,7 @@
               y: rs.cp2y + cpM.y * 2 * radius
             };
 
-			var srcCtrlPtIntn = intersectLineSelection(this, src, cpProj.x, cpProj.y, edge._private.data.portSource);
+			var srcCtrlPtIntn = intersectLineSelection(this, src, cpProj.x, cpProj.y, edge._private.data.portsource);
 
 
             if( closeStartACp ){
@@ -1151,7 +1151,7 @@
               y: rs.cp2y + cpM.y * 2 * radius
             };
 
-			var tgtCtrlPtIntn = intersectLineSelection(this, tgt, cpProj.x, cpProj.y, edge._private.data.portTarget);
+			var tgtCtrlPtIntn = intersectLineSelection(this, tgt, cpProj.x, cpProj.y, edge._private.data.porttarget);
 
 
             if( closeEndACp ){
@@ -2812,7 +2812,7 @@
 			//add a little black circle to ports
 			var oldStyle = context.fillStyle;
 			context.fillStyle = $$.sbgn.colors.port;
-			$$.sbgn.drawEllipse(context, portX, portY, 5, 5);
+			$$.sbgn.drawEllipse(context, portX, portY, 2, 2);
 			context.fillStyle = oldStyle;
 			context.stroke();
 		}
@@ -2841,7 +2841,7 @@
 			//add a little black circle to ports
 			var oldStyle = context.fillStyle;
 			context.fillStyle = $$.sbgn.colors.port;
-			$$.sbgn.drawEllipse(context, portX, portY, 5, 5);
+			$$.sbgn.drawEllipse(context, portX, portY, 2, 2);
 			context.fillStyle = oldStyle;
 			context.stroke();
 		}
@@ -2862,7 +2862,7 @@
 			var port = node._private.data.ports[i];
 			if(portId == port.id){
 				return $$.math.intersectLineEllipse(
-					x, y, port.x + nodeX, port.y + nodeY, 5/2, 5/2);
+					x, y, port.x + nodeX, port.y + nodeY, 1, 1);
 			}
 		}
 		return [];

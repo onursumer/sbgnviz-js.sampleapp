@@ -266,8 +266,8 @@ var sbgnmlToJson = {
         edgeObj.source = sourceAndTarget.source;
         edgeObj.target = sourceAndTarget.target;
 
-        edgeObj.portSource = $(ele).attr("source");
-        edgeObj.portTarget = $(ele).attr("target");
+        edgeObj.portsource = $(ele).attr("source");
+        edgeObj.porttarget = $(ele).attr("target");
 
         var cytoscapeJsEdge = {data : edgeObj};
         jsonArray.push(cytoscapeJsEdge);

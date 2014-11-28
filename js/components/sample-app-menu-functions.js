@@ -20,6 +20,10 @@ $( document ).ready( function() {
         el: '#sbgn-layout-table'
     });
 
+	var randomGraphProp = new RandomGraphPanel({
+		el: '#random-graph-properties'
+	});
+
     $("body").on("change", "#file-input", function(e) {
         if ($("#file-input").val() == "") {
             return;
@@ -184,7 +188,15 @@ $( document ).ready( function() {
         sbgnLayoutProp.applyLayout();
     });
 
-    $("#save-as-png").click(function(evt){
+	$("#random-graph-properties").click(function(e){
+		randomGraphProp.render();
+	});
+
+	$("#generate-random-graph").click(function(e){
+		randomGraphProp.generateGraph();
+	});
+
+	$("#save-as-png").click(function(evt){
         var pngContent = cy.png();
         window.open(pngContent, "_blank");
     });

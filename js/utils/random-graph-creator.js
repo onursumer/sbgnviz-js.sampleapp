@@ -18,7 +18,7 @@ function RandomGraphCreator(options)
 		removeDisconnectedNodes: true,
 		minNumberOfChildren: 5,
 		maxNumberOfChildren: 10,
-		probabilityOfBranchPrunning: 0.5,
+		probabilityOfBranchPruning: 0.5,
 		canvasSize: {
 			width: 640,
 			height: 480
@@ -42,6 +42,8 @@ function RandomGraphCreator(options)
 	var _rootModel;
 
 	var _nodeIdMap = {};
+	var _targetConnections = {};
+	var _sourceConnections = {};
 
 	function run()
 	{
@@ -103,7 +105,7 @@ function RandomGraphCreator(options)
 
 		for (var i = 0; i < _options.noOfSiblings; i++)
 		{
-			if (_options.probabilityOfBranchPrunning < nextDouble())
+			if (_options.probabilityOfBranchPruning < nextDouble())
 			{
 				if (_nodes.length < _options.noOfNodes)
 				{
@@ -144,8 +146,8 @@ function RandomGraphCreator(options)
 	{
 		var node = {
 			data: {
-				// TODO this is sbgn renderer specific...
-				sbgnbbox: {}
+				sbgnbbox: {},
+				random: {}
 			}
 		};
 
@@ -171,12 +173,9 @@ function RandomGraphCreator(options)
 
 		node.data.sbgnbbox.w = width;
 		node.data.sbgnbbox.h = height;
-		node.data.text = _noOfCreatedNodes;
+		node.data.random.label = _noOfCreatedNodes;
 		node.data.id = "n" + _noOfCreatedNodes;
-		node.data.shape = "rectangle";
-
-		// TODO node text
-		//node.setText(Integer.toString(this.noOfCreatedNodes));
+		node.data.sbgnclass = "random";
 
 		// Randomly distribute nodes on the canvas by looking at the current
 		// size of the canvas window (minus some buffer for the scrollbars)
@@ -242,7 +241,7 @@ function RandomGraphCreator(options)
 
 	function createEdges()
 	{
-		var noOfIGEs = Math.floor(_options.noOfEdges * _options.percentageOfIGEs);
+		var noOfIGEs = Math.floor(_options.noOfEdges * (_options.percentageOfIGEs / 100));
 
 		var createdIGEs = 0;
 		var trial = 0;
@@ -290,7 +289,8 @@ function RandomGraphCreator(options)
 			{
 				var graph = graphArray[index];
 
-				if (graph.nodes.length < 2)
+				if (graph.nodes == null ||
+				    graph.nodes.length < 2)
 				{
 					continue;
 				}
@@ -316,7 +316,7 @@ function RandomGraphCreator(options)
 	{
 		var nodes = compound.nodes;
 		//HashSet<Integer> indexPot = new HashSet<Integer>();
-		var indexPot = {};
+		var indexPot = [];
 
 		// create indexPot
 		for (var i = 0; i < nodes.length; i++)
@@ -324,7 +324,7 @@ function RandomGraphCreator(options)
 			indexPot.push(i);
 		}
 
-		while (!indexPot.isEmpty())
+		while (indexPot.length > 0)
 		{
 			// randomly choose indexes of source and target nodes
 			var firstNodeIndex = nextInt(nodes.length);
@@ -420,7 +420,7 @@ function RandomGraphCreator(options)
 
 			for (var i=0; i < sourceConnections.length; i++)
 			{
-				var edge = targetConnections[i];
+				var edge = sourceConnections[i];
 				var targetId = edge.data.target;
 
 				if (targetId == secondNode.data.id)
@@ -443,14 +443,26 @@ function RandomGraphCreator(options)
 
 	function getTargetConnections(node)
 	{
-		// TODO get target connections of the given node!!
-		return [];
+		var connections = [];
+
+		if (node && node.data)
+		{
+			connections = _targetConnections[node.data.id];
+		}
+
+		return connections || [];
 	}
 
 	function getSourceConnections(node)
 	{
-		// TODO get source connections of the given node!!
-		return [];
+		var connections = [];
+
+		if (node && node.data)
+		{
+			connections = _sourceConnections[node.data.id];
+		}
+
+		return connections || [];
 	}
 
 	/**
@@ -463,7 +475,10 @@ function RandomGraphCreator(options)
 		//assert src != trgt;
 
 		var edge = {
-			data: {source: src.data.id, target: trgt.data.id}
+			data: {
+				source: src.data.id,
+				target: trgt.data.id
+			}
 		};
 
 //		CreateConnectionCommand command = new CreateConnectionCommand();
@@ -507,6 +522,20 @@ function RandomGraphCreator(options)
 //			}
 //		}
 
+		// update connections...
+		if (_targetConnections[edge.data.target] == null)
+		{
+			_targetConnections[edge.data.target] = [];
+		}
+
+		if (_sourceConnections[edge.data.source] == null)
+		{
+			_sourceConnections[edge.data.source] = [];
+		}
+
+		_targetConnections[edge.data.target].push(edge);
+		_sourceConnections[edge.data.source].push(edge);
+
 		return edge;
 	}
 
@@ -517,8 +546,8 @@ function RandomGraphCreator(options)
 	{
 		var result = false;
 
-		if (_adjacencyMatrix[srcIndex][trgIndex] == 1 ||
-		    _adjacencyMatrix[trgIndex][srcIndex] == 1 )
+		if ((_adjacencyMatrix[srcIndex] && _adjacencyMatrix[srcIndex][trgIndex] == 1) ||
+		    (_adjacencyMatrix[trgIndex] && _adjacencyMatrix[trgIndex][srcIndex]) == 1 )
 		{
 			result = true;
 		}

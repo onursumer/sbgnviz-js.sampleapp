@@ -29,6 +29,11 @@ var sbgnStyleSheet = cytoscape.stylesheet()
             'padding-left' : '20',
             'padding-right' : '20'
         })
+        .selector("node[sbgnclass='random']")
+        .css({
+            'content' : 'data(random.label)',
+            'shape' : 'rectangle'
+        })
         .selector("node[sbgnclass!='complex'][sbgnclass!='compartment'][sbgnclass!='submap']")
         .css({
             'width' : 'data(sbgnbbox.w)',

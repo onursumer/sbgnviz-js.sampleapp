@@ -400,18 +400,18 @@ var RandomGraphPanel = Backbone.View.extend({
         $(self.el).dialog();
 
         $("#save-random-config").die("click").live("click", function(evt) {
-            self.currentProperties.noOfNodes = $("#random-no-of-nodes").val();
-	        self.currentProperties.noOfEdges = $("#random-no-of-edges").val();
-	        self.currentProperties.maxDepth = $("#random-max-depth").val();
-	        self.currentProperties.noOfSiblings = $("#random-no-of-siblings").val();
-	        self.currentProperties.minNodeSize.width = $("#random-min-node-width").val();
-	        self.currentProperties.minNodeSize.height = $("#random-min-node-height").val();
-	        self.currentProperties.maxNodeSize.width = $("#random-max-node-width").val();
-	        self.currentProperties.maxNodeSize.height = $("#random-max-node-height").val();
-	        self.currentProperties.percentageOfIGEs = $("#random-percent-ige").val();
-	        self.currentProperties.minNumberOfChildren = $("#random-min-no-of-children").val();
-	        self.currentProperties.maxNumberOfChildren = $("#random-max-no-of-children").val();
-	        self.currentProperties.probabilityOfBranchPruning = $("#random-probability-of-branch-pruning").val();
+            self.currentProperties.noOfNodes = parseInt($("#random-no-of-nodes").val());
+	        self.currentProperties.noOfEdges = parseInt($("#random-no-of-edges").val());
+	        self.currentProperties.maxDepth = parseInt($("#random-max-depth").val());
+	        self.currentProperties.noOfSiblings = parseInt($("#random-no-of-siblings").val());
+	        self.currentProperties.minNodeSize.width = parseInt($("#random-min-node-width").val());
+	        self.currentProperties.minNodeSize.height = parseInt($("#random-min-node-height").val());
+	        self.currentProperties.maxNodeSize.width = parseInt($("#random-max-node-width").val());
+	        self.currentProperties.maxNodeSize.height = parseInt($("#random-max-node-height").val());
+	        self.currentProperties.percentageOfIGEs = parseInt($("#random-percent-ige").val());
+	        self.currentProperties.minNumberOfChildren = parseInt($("#random-min-no-of-children").val());
+	        self.currentProperties.maxNumberOfChildren = parseInt($("#random-max-no-of-children").val());
+	        self.currentProperties.probabilityOfBranchPruning = parseFloat($("#random-probability-of-branch-pruning").val());
 
 	        $(self.el).dialog('close');
         });

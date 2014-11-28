@@ -377,7 +377,7 @@ var RandomGraphPanel = Backbone.View.extend({
         self.template = _.template($("#random-graph-settings-template").html(), self.currentProperties);
     },
     copyProperties: function(){
-        this.currentProperties = _.clone(this.defaultLayoutProperties);
+        this.currentProperties = _.clone(this.defaultProperties);
     },
     generateGraph: function(){
         var options = this.currentProperties;

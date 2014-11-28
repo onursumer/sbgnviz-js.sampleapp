@@ -21,7 +21,7 @@ $( document ).ready( function() {
     });
 
 	var randomGraphProp = new RandomGraphPanel({
-		el: '#random-graph-properties'
+		el: '#random-graph-table'
 	});
 
     $("body").on("change", "#file-input", function(e) {

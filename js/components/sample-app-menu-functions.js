@@ -186,7 +186,38 @@ $( document ).ready( function() {
 
     $("#save-as-png").click(function(evt){
         var pngContent = cy.png();
-        window.open(pngContent, "_blank");
+
+	    // see http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
+	    function b64toBlob(b64Data, contentType, sliceSize) {
+		    contentType = contentType || '';
+		    sliceSize = sliceSize || 512;
+
+		    var byteCharacters = atob(b64Data);
+		    var byteArrays = [];
+
+		    for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+			    var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+			    var byteNumbers = new Array(slice.length);
+			    for (var i = 0; i < slice.length; i++) {
+				    byteNumbers[i] = slice.charCodeAt(i);
+			    }
+
+			    var byteArray = new Uint8Array(byteNumbers);
+
+			    byteArrays.push(byteArray);
+		    }
+
+		    var blob = new Blob(byteArrays, {type: contentType});
+		    return blob;
+	    }
+
+	    // this is to remove the beginning of the pngContent: data:img/png;base64,
+	    var b64data = pngContent.substr(pngContent.indexOf(",") + 1);
+
+	    saveAs(b64toBlob(b64data, "image/png"), "network.png");
+
+	    //window.open(pngContent, "_blank");
     });
 
     $("#load-file").click(function(evt){

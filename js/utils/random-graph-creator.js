@@ -15,14 +15,15 @@ function RandomGraphCreator(options)
 			height: 50
 		},
 		percentageOfIGEs: 30,
-		removeDisconnectedNodes: true,
-		minNumberOfChildren: 5,
-		maxNumberOfChildren: 10,
 		probabilityOfBranchPruning: 0.5,
 		canvasSize: {
 			width: 640,
 			height: 480
-		}
+		},
+		// TODO these options for non-compound nodes...
+		removeDisconnectedNodes: true,
+		minNumberOfChildren: 5,
+		maxNumberOfChildren: 10
 	};
 
 	// merge options with default options to use defaults for missing values

@@ -360,10 +360,6 @@ var RandomGraphPanel = Backbone.View.extend({
 		    height: 50
 	    },
 	    percentageOfIGEs: 30,
-	    // TODO remove disconnected nodes not implemented yet...
-	    removeDisconnectedNodes: true,
-	    minNumberOfChildren: 5,
-	    maxNumberOfChildren: 10,
 	    probabilityOfBranchPruning: 0.5,
 	    canvasSize: {
 		    width: 640,
@@ -409,8 +405,8 @@ var RandomGraphPanel = Backbone.View.extend({
 	        self.currentProperties.maxNodeSize.width = parseInt($("#random-max-node-width").val());
 	        self.currentProperties.maxNodeSize.height = parseInt($("#random-max-node-height").val());
 	        self.currentProperties.percentageOfIGEs = parseInt($("#random-percent-ige").val());
-	        self.currentProperties.minNumberOfChildren = parseInt($("#random-min-no-of-children").val());
-	        self.currentProperties.maxNumberOfChildren = parseInt($("#random-max-no-of-children").val());
+	        //self.currentProperties.minNumberOfChildren = parseInt($("#random-min-no-of-children").val());
+	        //self.currentProperties.maxNumberOfChildren = parseInt($("#random-max-no-of-children").val());
 	        self.currentProperties.probabilityOfBranchPruning = parseFloat($("#random-probability-of-branch-pruning").val());
 
 	        $(self.el).dialog('close');

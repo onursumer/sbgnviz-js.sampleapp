@@ -193,8 +193,10 @@ body {
     text-align: center;
 }
 
-.quick-help {
-	font-size:13px;
+.quick-help-content {
+	font-size: 11px;
+	margin-left: 20px;
+	margin-right: 20px;
 }
 
 .node-details-text {

@@ -75,7 +75,7 @@ $( document ).ready( function() {
 			_.template($("#quick-help-template").html(), {}),
 			{
 				'autoDimensions' : false,
-				'width' : 400,
+				'width' : 420,
 				'height' : "auto",
 				'transitionIn' : 'none',
 				'transitionOut' : 'none'

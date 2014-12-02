@@ -292,7 +292,7 @@ var SBGNLayout = Backbone.View.extend({
         edgeElasticity: 100,
         nestingFactor: 5,
         gravity: 250,
-        numIter: 100
+        numIter: 300
     },
     currentLayoutProperties: null,
 

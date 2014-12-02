@@ -69,6 +69,19 @@ $( document ).ready( function() {
         });
     });
 
+	$("#quick-help").click(function(e){
+		e.preventDefault();
+		$.fancybox(
+			_.template($("#quick-help-template").html(), {}),
+			{
+				'autoDimensions' : false,
+				'width' : 400,
+				'height' : "auto",
+				'transitionIn' : 'none',
+				'transitionOut' : 'none'
+			});
+	});
+
     $("#about").click(function(e){
         e.preventDefault();
         $.fancybox(
